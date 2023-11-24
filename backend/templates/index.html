@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Python Runner</title>
+    <style>
+        pre {
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form id="pythonForm">
+            <label for="user_script">Script</label><br>
+            <textarea id="user_script" name="user_script" rows="10" cols="40" class="prettyprint"></textarea><br><br>
+        </form>
+        <form id="pythonForm">
+            <label for="user_requirements">Requirements</label><br>
+            <textarea id="user_requirements" name="user_requirements" rows="10" cols="40" class="prettyprint"></textarea><br><br>
+        </form>
+        <form id="pythonForm">
+            <label for="service">Service</label><br>
+            <textarea id="service" name="service" rows="10" cols="40" class="prettyprint"></textarea><br><br>
+        </form>
+        <button type="button" onclick="upload()">Esegui</button>
+    </div>
+    <div id="resultContainer" style="margin-top: 20px; display: none;">
+        <pre id="result"></pre>
+        <pre id="debug"></pre>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function upload() {
+            var userProgram = $("#user_script").val();
+            var userRequirements = $("#user_requirements").val();
+            var service = $("#service").val();
+
+            $.ajax({
+                type: 'POST',
+                url: '/upload',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({ user_script: userProgram,  user_requirements: userRequirements, service: service}),
+                success: function(response) {
+                    $("#result").text(response.status);
+                    $("#debug").text(response.debug);
+                    $("#resultContainer").show();
+                },
+                error: function(error) {
+                    console.error('ERROR ', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

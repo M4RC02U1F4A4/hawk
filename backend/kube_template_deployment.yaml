@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hawk-HASH
+  namespace: hawk
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: hawk-HASH
+  template:
+    metadata:
+      name: hawk-HASH
+      namespace: hawk
+      labels:
+        app: hawk-HASH
+    spec:
+      containers:
+      - name: hawk-HASH-container
+        image: python:3.11-slim
