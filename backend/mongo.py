@@ -20,3 +20,5 @@ def add_new_script(script, requirements, hash, service):
     except:
         return False
     
+def extract_script_files(hash):
+    return scriptsDB.find_one({"_id":f"{hash}"})

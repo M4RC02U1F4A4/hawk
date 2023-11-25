@@ -1,5 +1,6 @@
 from kubernetes import client, config
 import yaml
+from mongo import extract_script_files
 
 def list_pods(namespace):
     config.load_kube_config()
@@ -19,16 +20,26 @@ def get_pod_logs(namespace, pod_name):
     except Exception as e:
         print(f"{e}")
 
-def create_new_attack(namespace):
+def create_new_attack(namespace, hash):
     config.load_kube_config()
     api_instance_deployment = client.AppsV1Api()
     api_instance_configmap = client.CoreV1Api()
 
+    files = extract_script_files(hash)
+    script = files['script']
+    requirements = files['requirements']
 
-    with open("kube_template_config.yaml") as f:
-        kube_template_configmap = f.read().replace("HASH", "asnajqnendmalhas")
-    with open("kube_template_deployment.yaml") as f:
-        kube_template_deployment = f.read().replace("HASH", "asnajqnendmalhas")
+    with open("kube_template/config.yaml") as f:
+        file_content=f.read()
+        configmap = client.V1ConfigMap(
+        api_version="v1",
+        kind="ConfigMap",
+        data=dict(test=file_content)
+        )
+        
+    with open("kube_template/deployment.yaml") as f:
+        kube_template_deployment = f.read().replace("HASH", f"{hash}")
+
 
     kube_template_configmap = yaml.safe_load(kube_template_configmap)
     kube_template_deployment = yaml.safe_load(kube_template_deployment)

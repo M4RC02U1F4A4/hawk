@@ -31,9 +31,9 @@ def upload():
     return "ERROR"
 
 @app.route("/start/<hash>", methods=['GET'])
-def start():
+def start(hash):
     if request.method == 'GET':
-        # create_new_attack("hawk")
+        create_new_attack("hawk", hash)
     return "ERROR"
 
 if __name__ == "__main__":

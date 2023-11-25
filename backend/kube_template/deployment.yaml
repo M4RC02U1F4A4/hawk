@@ -19,3 +19,13 @@ spec:
       containers:
       - name: hawk-HASH-container
         image: python:3.11-slim
+        command: ['bash', '-c']
+        args: ['python3 -m pip install -r /app/requirements.txt && sleep 300 && python3 /app/script.py']
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app
+      volumes:
+      - name: config-volume
+        configMap:
+          name: hawk-HASH-config
+
