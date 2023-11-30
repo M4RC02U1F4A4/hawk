@@ -1,58 +1,99 @@
 from kubernetes import client, config
 import yaml
 from mongo import extract_script_files
-
-def list_pods(namespace):
-    config.load_kube_config()
-    api_instance = client.CoreV1Api()
-    try:
-        pods = api_instance.list_namespaced_pod(namespace=namespace)
-        return pods.items
-    except Exception as e:
-        print(f"{e}")
-
-def get_pod_logs(namespace, pod_name):
-    config.load_kube_config()
-    api_instance = client.CoreV1Api()
-    try:
-        pod_logs = api_instance.read_namespaced_pod_log(name=pod_name, namespace=namespace)
-        return pod_logs
-    except Exception as e:
-        print(f"{e}")
+import base64
 
 def create_new_attack(namespace, hash):
     config.load_kube_config()
-    api_instance_deployment = client.AppsV1Api()
-    api_instance_configmap = client.CoreV1Api()
-
+    
     files = extract_script_files(hash)
-    script = files['script']
-    requirements = files['requirements']
+    api_instance = client.CoreV1Api()
+    config_map = {
+            'apiVersion': 'v1',
+            'kind': 'ConfigMap',
+            'metadata': {'name': f'hawk-script-{hash}-config'},
+            'binaryData': {
+                'script.py': base64.b64encode(files['script']).decode('utf-8'),
+                'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8')
+                }
+        }
+    try:
+        api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+    except:
+        pass 
 
-    with open("kube_template/config.yaml") as f:
-        file_content=f.read()
-        configmap = client.V1ConfigMap(
-        api_version="v1",
-        kind="ConfigMap",
-        data=dict(test=file_content)
-        )
-        
-    with open("kube_template/deployment.yaml") as f:
-        kube_template_deployment = f.read().replace("HASH", f"{hash}")
-
-
-    kube_template_configmap = yaml.safe_load(kube_template_configmap)
-    kube_template_deployment = yaml.safe_load(kube_template_deployment)
+    pod = client.V1Pod(
+    metadata=client.V1ObjectMeta(name=f"hawk-script-{hash}"),
+    spec=client.V1PodSpec(
+        containers=[
+            client.V1Container(
+                name=f"hawk-script-{hash}-container",
+                image="python:3.11-slim",
+                command=['bash', '-c'],
+                args=['python3 -m pip install -r /app/requirements.txt && sleep 5 && echo "Starting..." && python3 /app/script.py'],
+                volume_mounts=[
+                    client.V1VolumeMount(
+                        name="config-volume",
+                        mount_path="/app"
+                    )
+                ]
+            )
+        ],
+        termination_grace_period_seconds=10,
+        volumes=[
+            client.V1Volume(
+                name="config-volume",
+                config_map=client.V1ConfigMapVolumeSource(
+                    name=f"hawk-script-{hash}-config",
+                    items=[
+                        client.V1KeyToPath(key="script.py", path="script.py"),
+                        client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
+                    ]
+                )
+            )
+        ]
+    )
+    )
 
     try:
-        api_instance_configmap.create_namespaced_config_map(namespace=namespace, body=kube_template_configmap)
-        api_instance_deployment.create_namespaced_deployment(namespace=namespace, body=kube_template_deployment)
-    except Exception as e:
-        print(f"{e}")
+        api_instance.create_namespaced_pod(namespace=namespace, body=pod)
+    except:
+        pass
 
-namespace = "hawk"
-for pod in list_pods(namespace):
-    print(pod.metadata.name)
-    print(pod.status.phase)
-    # print(get_pod_logs(namespace, pod.metadata.name))
-# create_new_attack(namespace)
+def delete_attack(namespace, hash):
+    config.load_kube_config()
+    api_instance = client.CoreV1Api()
+    try:
+        api_instance.delete_namespaced_config_map(name=f'hawk-script-{hash}-config', namespace=namespace)
+    except:
+        pass
+    try:
+        api_instance.delete_namespaced_pod(name=f"hawk-script-{hash}", namespace=namespace, body=client.V1DeleteOptions())
+    except:
+        pass
+
+def get_status(namespace, hash):
+    config.load_kube_config()
+    api_instance = client.CoreV1Api()
+    try:
+        pod_list = api_instance.list_namespaced_pod(namespace=namespace)
+        matching_pods = [pod for pod in pod_list.items if hash in pod.metadata.name][0]
+        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase}}
+    except:
+        return {'status': 'ERROR', 'message': 'Error getting pod status.'}
+
+def get_logs(namespace, hash):
+    config.load_kube_config()
+    api_instance = client.CoreV1Api()
+    try:
+        pod_list = api_instance.list_namespaced_pod(namespace=namespace)
+        matching_pods = [pod for pod in pod_list.items if hash in pod.metadata.name][0]
+        pod_logs = api_instance.read_namespaced_pod_log(name=matching_pods.metadata.name, namespace=namespace)
+        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}
+    except:
+        return {'status': 'ERROR', 'message': 'Error getting pod logs.'}
+
+# namespace = "hawk"
+# hash = "7799bfb87d"
+
+# print(get_status(namespace, hash))
