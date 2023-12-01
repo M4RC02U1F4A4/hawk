@@ -93,8 +93,3 @@ def get_logs(namespace, script_id):
         return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}
     except:
         return {'status': 'ERROR', 'message': 'Error getting pod logs.'}
-
-# namespace = "hawk"
-# script_id = "7799bfb87d"
-
-# print(get_status(namespace, script_id))

@@ -6,22 +6,6 @@ from bson import Binary
 
 app = Flask(__name__)
 
-# [
-#   {
-#   "_id": "1",
-#   "name": "Service 1"
-#   },
-#   {
-#   "_id": "2",
-#   "name": "Service 2"
-#   },
-#   {
-#   "_id": "3",
-#   "name": "Service 3"
-#   }
-# ]
-
-# TODO usare un'ID come identificativo e permettere la modifica dei parametri
 @app.route("/add/service", methods=['POST'])
 def http_add_new_service():
     if request.method == 'POST':
