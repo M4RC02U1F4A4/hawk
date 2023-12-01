@@ -1,81 +1,104 @@
 from flask import Flask, render_template, request, jsonify
 import hashlib
-from mongo import add_new_script, add_new_service, extract_services, delete_service
+from mongo import add_new_script, add_new_service, extract_services, delete_service, delete_script, extract_scripts
 from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
 
 app = Flask(__name__)
 
+# [
+#   {
+#   "_id": "1",
+#   "name": "Service 1"
+#   },
+#   {
+#   "_id": "2",
+#   "name": "Service 2"
+#   },
+#   {
+#   "_id": "3",
+#   "name": "Service 3"
+#   }
+# ]
 
+# TODO usare un'ID come identificativo e permettere la modifica dei parametri
 @app.route("/add/service", methods=['POST'])
-def add_service():
+def http_add_new_service():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            if data['service']:
-                return jsonify(add_new_service(data['service']))
+            if data['name'] and data['port']:
+                return jsonify(add_new_service(data['name'], data['port']))
         return jsonify({'status': 'ERROR', 'message': 'Service not valid'})
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
  
 @app.route("/delete/service", methods=['DELETE'])
-def delete_service():
+def http_delete_service():
     if request.method == 'DELETE':
         if request.is_json:
             data = request.get_json()
-            if data['service']:
-                return delete_service(data['service'])
-        return jsonify({'status': 'ERROR', 'message': 'Service not valid'})
+            if data['id']:
+                return jsonify(delete_service(data['id']))
+        return jsonify({'status': 'ERROR', 'message': 'Service ID not valid'})
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
     
 @app.route("/get/services", methods=['GET'])
-def get_services():
+def http_get_services():
     return jsonify(extract_services())
 
 
 
 @app.route("/add/script", methods=['POST'])
-def add_script():
+def http_add_script():
     if request.method == 'POST':
         user_script = request.files['user_script']
-        service = request.form.get('service')
+        service_id = request.form.get('service')
         user_requirements = request.files['user_requirements']
 
         user_script_binary = Binary(user_script.read())
         user_requirements_binary = Binary(user_requirements.read())
 
-        entry_hash = hashlib.sha256(f"{user_script_binary}{user_requirements_binary}{service}".encode()).hexdigest()[:16]
-
-        if not add_new_script(user_script_binary, user_requirements_binary, entry_hash, service):
-            return jsonify({'status': "ERROR"})
-            
-        return jsonify({'status': "OK", 'message':f"Script '{entry_hash}' added.", 'data':{'hash':f"{entry_hash}"}})
-    return jsonify({'status': "ERROR", 'message': 'ERROR'})
-
-
-@app.route("/start/<hash>", methods=['GET'])
-def start(hash):
-    if request.method == 'GET':
-        create_new_attack("hawk", hash)
-        return jsonify({'status': "OK", 'message':f"Attack with script {hash} started."})
-    return jsonify({'status': "ERROR", 'message': 'ERROR'})
-
-@app.route("/delete/<hash>", methods=['GET'])
-def delete(hash):
-    if request.method == 'GET':
-        delete_attack("hawk", hash)
-        return jsonify({'status': "OK", 'message':f"Attack with script {hash} ended."})
-    return jsonify({'status': "ERROR", 'message': 'ERROR'})
-
-@app.route("/status/<hash>", methods=['GET'])
-def status(hash):
-    if request.method == 'GET':
-        return jsonify(get_status("hawk", hash))
+        return add_new_script(user_script_binary, user_requirements_binary, service_id)
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
 
-@app.route("/logs/<hash>", methods=['GET'])
-def logs(hash):
+@app.route("/delete/script", methods=['DELETE'])
+def http_delete_script():
+    if request.method == 'DELETE':
+        if request.is_json:
+            data = request.get_json()
+            if data['id']:
+                return jsonify(delete_script(data['id']))
+        return jsonify({'status': 'ERROR', 'message': 'Script ID not valid'})
+    return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
+
+@app.route("/get/scripts", methods=['GET'])
+def http_get_scripts():
+    return jsonify(extract_scripts())
+
+@app.route("/start/<id>", methods=['GET'])
+def http_start(id):
     if request.method == 'GET':
-        return jsonify(get_logs("hawk", hash))
+        create_new_attack("hawk", id)
+        return jsonify({'status': "OK", 'message':f"Attack with script ID {id} started."})
+    return jsonify({'status': "ERROR", 'message': 'ERROR'})
+
+@app.route("/delete/<id>", methods=['GET'])
+def http_delete(id):
+    if request.method == 'GET':
+        delete_attack("hawk", id)
+        return jsonify({'status': "OK", 'message':f"Attack with script ID {id} ended."})
+    return jsonify({'status': "ERROR", 'message': 'ERROR'})
+
+@app.route("/status/<id>", methods=['GET'])
+def http_status(id):
+    if request.method == 'GET':
+        return jsonify(get_status("hawk", id))
+    return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
+
+@app.route("/logs/<id>", methods=['GET'])
+def http_logs(id):
+    if request.method == 'GET':
+        return jsonify(get_logs("hawk", id))
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
 
 
