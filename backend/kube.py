@@ -25,6 +25,7 @@ def create_new_attack(namespace, script_id):
     pod = client.V1Pod(
     metadata=client.V1ObjectMeta(name=f"hawk-script-{script_id}"),
     spec=client.V1PodSpec(
+        restart_policy="Never",
         containers=[
             client.V1Container(
                 name=f"hawk-script-{script_id}-container",
