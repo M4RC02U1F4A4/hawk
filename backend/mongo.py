@@ -97,7 +97,7 @@ def extract_scripts():
             script['requirements'] = base64.b64encode(script['requirements']).decode("utf-8")
         logging.debug(f"Scripts: {scripts}")
         return {'status': 'OK', 'message': 'Scripts extracted.', 'data':scripts}
-    except Exception as err:
+    except:
         logging.debug("Error extracting services")
         return {'status': 'ERROR', 'message': 'Error extracting scripts.'}
 
