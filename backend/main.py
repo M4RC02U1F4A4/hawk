@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, jsonify
 import hashlib
-from mongo import add_new_script, add_new_service, extract_services, delete_service, delete_script, extract_scripts
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts
 from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/add/service", methods=['POST'])
 def http_add_new_service():
@@ -24,6 +26,16 @@ def http_delete_service():
             if data['id']:
                 return jsonify(delete_service(data['id']))
         return jsonify({'status': 'ERROR', 'message': 'Service ID not valid'})
+    return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
+
+@app.route("/edit/service", methods=['POST'])
+def http_editservice():
+    if request.method == 'POST':
+        if request.is_json:
+            data = request.get_json()
+            if data['id'] and data['name'] and data['port']:
+                return jsonify(edit_service(data['id'], data['name'], data['port']))
+        return jsonify({'status': 'ERROR', 'message': 'Service not valid'})
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
     
 @app.route("/get/services", methods=['GET'])

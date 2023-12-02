@@ -30,7 +30,7 @@ def delete_service(service_id):
     try:
         if scriptsDB.count_documents({"service": service_id}) == 0:   
             servicesDB.delete_one({"_id": service_id}) 
-            logging.debug(f"Service with ID '{service_id}' deleted")
+            logging.debug(f"Service with ID '{service_id}' deleted.")
             return {'status': 'OK', 'message': f"Service with ID '{service_id}' deleted."}
         elif scriptsDB.count_documents({"service": service_id}) > 0:
             logging.debug(f"There are still scripts associated with the '{service_id}' service.")
@@ -38,6 +38,17 @@ def delete_service(service_id):
     except:
         logging.debug(f"Error deleting service with ID '{service_id}'.")
         return {'status': 'ERROR', 'message': f"Error deleting service with ID '{service_id}'."}
+    
+def edit_service(service_id, service_name, service_port):
+    service_id = ObjectId(service_id)
+    logging.debug(f"Editing service with ID '{service_id}'...")
+    try:
+        servicesDB.update_one({'_id': service_id}, {'$set':{'name': service_name, 'port': service_port}})
+        logging.debug(f"Service with ID '{service_id}' edited.")
+        return {'status': 'OK', 'message': f"Service with ID '{service_id}' edited."}
+    except:
+        logging.debug(f"Error editing service with ID '{service_id}'.")
+        return {'status': 'ERROR', 'message': f"Error editing service with ID '{service_id}'."}
 
 def extract_services():
     logging.debug("Extracting all services")
