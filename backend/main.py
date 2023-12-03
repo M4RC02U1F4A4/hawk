@@ -49,12 +49,13 @@ def http_add_script():
     if request.method == 'POST':
         user_script = request.files['user_script']
         service_id = request.form.get('service')
+        script_name = request.form.get('name')
         user_requirements = request.files['user_requirements']
 
         user_script_binary = Binary(user_script.read())
         user_requirements_binary = Binary(user_requirements.read())
 
-        return add_new_script(user_script_binary, user_requirements_binary, service_id)
+        return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id)
     return jsonify({'status': "ERROR", 'message': 'Method not supported.'})
 
 @app.route("/delete/script", methods=['DELETE'])

@@ -63,7 +63,7 @@ def extract_services():
         logging.debug("Error extracting services")
         return {'status': 'ERROR', 'message': 'Error extracting services.'}
 
-def add_new_script(script, requirements, service_id):
+def add_new_script(name, script, requirements, service_id):
     service_id = ObjectId(service_id)
     logging.debug(f"Checking if service with ID '{service_id}' exist")
     if not servicesDB.find_one({"_id":service_id}):
@@ -74,6 +74,7 @@ def add_new_script(script, requirements, service_id):
     logging.debug(script)
     logging.debug(requirements)
     entry = {
+        "name": name,
         "script": script,
         "requirements": requirements,
         "service": service_id
