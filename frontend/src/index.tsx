@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
 import { NextUIProvider } from '@nextui-org/react';
+import './index.css'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <NextUIProvider>
-      <main className='dark text-foreground bg-background'>
+      <main className='dark text-foreground bg-background min-h-screen'>
       <App />
       </main>
     </NextUIProvider>

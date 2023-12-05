@@ -11,8 +11,8 @@ export function NavBar()   {
             <p className="font-bold text-inherit">HAWK</p>
         </NavbarBrand>
         <NavbarContent className="" justify="center">
-        {items.map((item)=>{
-                    return (<NavbarItem>
+        {items.map((item, index)=>{
+                    return (<NavbarItem key={index}>
                         <Link color="foreground" href={item.link} aria-current={item.isActive}>
                             {item.name}
                         </Link>
