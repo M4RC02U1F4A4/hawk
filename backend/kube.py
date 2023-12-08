@@ -1,20 +1,23 @@
 from kubernetes import client, config
 import yaml
-from mongo import extract_script_files
+from mongo import extract_script_files, extract_farm_script, extract_farm_url
 import base64
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
     
     files = extract_script_files(script_id)
+    farm_script = extract_farm_script()
+    farm_url = extract_farm_url()
     api_instance = client.CoreV1Api()
     config_map = {
             'apiVersion': 'v1',
             'kind': 'ConfigMap',
             'metadata': {'name': f'hawk-script-{script_id}-config'},
             'binaryData': {
-                'script.py': base64.b64encode(files['script']).decode('utf-8'),
-                'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8')
+                f'{script_id}.py': base64.b64encode(files['script']).decode('utf-8'),
+                'start_sploit.py': base64.b64encode(farm_script['script']).decode('utf-8'),
+                'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8'),
                 }
         }
     try:
@@ -32,6 +35,7 @@ def create_new_attack(namespace, script_id):
                 image="python:3.11-slim",
                 command=['bash', '-c'],
                 args=['python3 -m pip install -r /app/requirements.txt && sleep 5 && echo "Starting..." && python3 /app/script.py'],
+                # args=[f'chmod +x /app/start_sploit.py && python3 -m pip install -r /app/requirements.txt && echo "Starting..." && ./start_sploit.py /app/{script_id}.py -u {farm_url}'],
                 volume_mounts=[
                     client.V1VolumeMount(
                         name="config-volume",
@@ -48,6 +52,7 @@ def create_new_attack(namespace, script_id):
                     name=f"hawk-script-{script_id}-config",
                     items=[
                         client.V1KeyToPath(key="script.py", path="script.py"),
+                        client.V1KeyToPath(key="start_sploit.py", path="start_sploit.py"),
                         client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
                     ]
                 )

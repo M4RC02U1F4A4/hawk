@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import hashlib
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, config_startup
 from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+config_startup()
 
 @app.route("/add/service", methods=['POST'])
 def http_add_new_service():

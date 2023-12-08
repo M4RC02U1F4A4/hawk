@@ -2,6 +2,8 @@ import pymongo
 import logging
 from bson import ObjectId
 import base64
+import requests
+import os
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
@@ -12,6 +14,32 @@ scriptsDB = db['scripts']
 metricsDB = db['metrics']
 configsDB = db['configs']
 servicesDB = db['services']
+
+def config_startup():
+    try:
+        logging.debug(f"Adding farm script...")
+        response = requests.get("https://raw.githubusercontent.com/DestructiveVoice/DestructiveFarm/master/client/start_sploit.py")
+        script = response.content
+        entry = {
+            "_id":"farm_script",
+            "script": script
+            }
+        configsDB.insert_one(entry)
+        logging.debug(f"Farm script added.")
+    except Exception as e:
+        logging.debug(f"Error during farm script download.")
+    try:
+        logging.debug(f"Adding farm url...")
+        entry = {
+            "_id":"farm_url",
+            "url": os.getenv('FARM_URL')
+            }
+        configsDB.insert_one(entry)
+        logging.debug(f"Farm script url added.")
+    except:
+        logging.debug(f"Error during farm url add.")
+    
+
 
 def add_new_service(service_name, service_port):
     logging.debug(f"Adding service '{service_name}'...")
@@ -110,8 +138,14 @@ def extract_scripts():
         logging.debug(f"Scripts: {scripts}")
         return {'status': 'OK', 'message': 'Scripts extracted.', 'data':scripts}
     except:
-        logging.debug("Error extracting services")
+        logging.debug("Error extracting scripts.")
         return {'status': 'ERROR', 'message': 'Error extracting scripts.'}
-
+    
 def extract_script_files(script_id):
     return scriptsDB.find_one({"_id":ObjectId(script_id)})
+
+def extract_farm_script():
+    return configsDB.find_one({"_id": "farm_script"})
+
+def extract_farm_url():
+    return configsDB.find_one({"_id": "farm_url"})
