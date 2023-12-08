@@ -142,10 +142,13 @@ def extract_scripts():
         return {'status': 'ERROR', 'message': 'Error extracting scripts.'}
     
 def extract_script_files(script_id):
+    logging.debug("Extracting script file.")
     return scriptsDB.find_one({"_id":ObjectId(script_id)})
 
 def extract_farm_script():
+    logging.debug("Extracting farm script file.")
     return configsDB.find_one({"_id": "farm_script"})
 
 def extract_farm_url():
+    logging.debug("Extracting farm url.")
     return configsDB.find_one({"_id": "farm_url"})
