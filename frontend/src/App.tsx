@@ -1,7 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
-import ServicesPage from "./pages/services";
+
 import { DataContextProvider } from "./contexts/DataContextProvider";
+import ServicesPage from "./pages/services";
 
 const router = createBrowserRouter([
   { path: "/", element: <div>Home</div> },

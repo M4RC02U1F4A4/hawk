@@ -12,7 +12,7 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
 
   const fetchAllData = async () => {
     const output = await getServicesAPI();
-    console.log(output);
+    setServices(output);
   };
 
   const getServicesAPI = async (): Promise<Service[]> => {
@@ -29,7 +29,7 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
     }
   };
 
-  const setServiceAPI = async (service: Service) => {
+  const addServiceAPI = async (service: Service) => {
     const resl = await fetch("http://localhost:5001/add/service", {
       method: "POST",
       body: JSON.stringify({
@@ -58,7 +58,6 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
     console.log("Getting data....");
     fetchAllData().then(() => {
       setLoadingState(true);
-
       console.log("Data Retrived");
       setLoadingState(false);
     });
