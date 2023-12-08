@@ -62,7 +62,7 @@ def delete_service(service_id):
             return {'status': 'OK', 'message': f"Service with ID '{service_id}' deleted."}
         elif scriptsDB.count_documents({"service": service_id}) > 0:
             logging.debug(f"There are still scripts associated with the '{service_id}' service.")
-            return {'status': 'OK', 'message': f"There are still scripts associated with the '{service_id}' service."}
+            return {'status': 'ERROR', 'message': f"There are still scripts associated with the '{service_id}' service."}
     except:
         logging.debug(f"Error deleting service with ID '{service_id}'.")
         return {'status': 'ERROR', 'message': f"Error deleting service with ID '{service_id}'."}
@@ -95,8 +95,8 @@ def add_new_script(name, script, requirements, service_id):
     service_id = ObjectId(service_id)
     logging.debug(f"Checking if service with ID '{service_id}' exist")
     if not servicesDB.find_one({"_id":service_id}):
-        logging.debug(f"Service with ID '{service_id}' not found")
-        return {'status': 'ERROR', 'message': f"Service with ID '{service_id}' not found"}
+        logging.debug(f"Service with ID '{service_id}' not found.")
+        return {'status': 'ERROR', 'message': f"Service with ID '{service_id}' not found."}
     
     logging.debug(f"Adding script in service '{service_id}'")
     logging.debug(script)
