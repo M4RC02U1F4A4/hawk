@@ -51,11 +51,18 @@ const router = createBrowserRouter([
   const ContextData = createContext<ContextType | null>(null)
 
   const getServicesFromAPI = async (): Promise<Service[]> => {
-    const resl = await fetch('https://api.npoint.io/1ebdf9d8f718d80d365f') 
+    const resl = await fetch('http://localhost:5001/get/services') 
     if (!resl.ok) {
       throw new Error('Failed to get services')
     }
-    return await resl.json()
+    
+    const responseData = await resl.json()
+    if (responseData && responseData.data) {
+      return responseData.data;
+    } 
+    else {
+      throw new Error('Invalid response format');
+    }
   }
 
   const fetchAllData= async () =>{
