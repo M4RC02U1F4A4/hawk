@@ -23,7 +23,7 @@ def create_new_attack(namespace, script_id):
     try:
         api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
     except:
-        pass 
+        return {'status': 'ERROR', 'message': 'Error creating config map.'} 
 
     pod = client.V1Pod(
     metadata=client.V1ObjectMeta(name=f"hawk-script-{script_id}"),
@@ -34,7 +34,7 @@ def create_new_attack(namespace, script_id):
                 name=f"hawk-script-{script_id}-container",
                 image="python:3.11-slim",
                 command=['bash', '-c'],
-                args=['python3 -m pip install -r /app/requirements.txt && sleep 5 && echo "Starting..." && python3 /app/script.py'],
+                args=['python3 -m pip install -r /app/requirements.txt && sleep 5 && echo "Starting..." && python3 /app/{script_id}.py'],
                 # args=[f'chmod +x /app/start_sploit.py && python3 -m pip install -r /app/requirements.txt && echo "Starting..." && ./start_sploit.py /app/{script_id}.py -u {farm_url}'],
                 volume_mounts=[
                     client.V1VolumeMount(
@@ -51,7 +51,7 @@ def create_new_attack(namespace, script_id):
                 config_map=client.V1ConfigMapVolumeSource(
                     name=f"hawk-script-{script_id}-config",
                     items=[
-                        client.V1KeyToPath(key="script.py", path="script.py"),
+                        client.V1KeyToPath(key=f"{script_id}.py", path=f"{script_id}.py"),
                         client.V1KeyToPath(key="start_sploit.py", path="start_sploit.py"),
                         client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
                     ]
@@ -64,19 +64,28 @@ def create_new_attack(namespace, script_id):
     try:
         api_instance.create_namespaced_pod(namespace=namespace, body=pod)
     except:
-        pass
+        api_instance.delete_namespaced_config_map(namespace=namespace, body=config_map)
+        return {'status': 'ERROR', 'message': 'Error creating pod.'}
+    return {'status': "OK", 'message':f"Attack with script ID {script_id} started."}
+
 
 def delete_attack(namespace, script_id):
     config.load_kube_config()
+    success = True
     api_instance = client.CoreV1Api()
     try:
         api_instance.delete_namespaced_config_map(name=f'hawk-script-{script_id}-config', namespace=namespace)
     except:
-        pass
+        success = False
     try:
         api_instance.delete_namespaced_pod(name=f"hawk-script-{script_id}", namespace=namespace, body=client.V1DeleteOptions())
     except:
-        pass
+        success = False
+
+    if not success:
+        return {'status': "ERROR", 'message':f"Some errors has occured during the {script_id} deletion."}
+    return {'status': "OK", 'message':f"Attack with script ID {script_id} deleted."}
+    
 
 def get_status(namespace, script_id):
     config.load_kube_config()

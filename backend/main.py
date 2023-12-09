@@ -64,16 +64,15 @@ def http_get_scripts():
     return jsonify(extract_scripts()), 200
 
 
-# TODO: verify status
 @app.route("/start/<id>", methods=['GET'])
 def http_start(id):
-    create_new_attack("hawk", id)
-    return jsonify({'status': "OK", 'message':f"Attack with script ID {id} started."}), 200
+    return jsonify(create_new_attack("hawk", id), 200)
+    
 
 @app.route("/delete/<id>", methods=['GET'])
 def http_delete(id):
-    delete_attack("hawk", id)
-    return jsonify({'status': "OK", 'message':f"Attack with script ID {id} ended."}), 200
+    return jsonify(delete_attack("hawk", id)), 200
+     
 
 @app.route("/status/<id>", methods=['GET'])
 def http_status(id):
