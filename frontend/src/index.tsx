@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import { NextUIProvider } from '@nextui-org/react';
 import './index.css'
+ import "react-toastify/dist/ReactToastify.css";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -10,8 +11,8 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <NextUIProvider>
-      <main className='dark text-foreground bg-background min-h-screen'>
-      <App />
+      <main className="min-h-screen dark text-foreground bg-background">
+        <App />
       </main>
     </NextUIProvider>
   </React.StrictMode>

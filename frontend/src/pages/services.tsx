@@ -22,10 +22,14 @@ import { EditIcon } from "../icons/EditIcon";
 import { DeleteIcon } from "../icons/DeleteIcon";
 import { PlusIcon } from "../icons/PlusIcon";
 import { DataContext } from "../contexts/DataContextProvider";
+import { Service } from "../types/ServicesTypes";
+import { toast } from "react-toastify";
 
 export default function ServicesPage() {
-  const services = useContext(DataContext)?.services;
-
+  const context = useContext(DataContext);
+  const services = context?.services;
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [selectedService, setSelectedService] = useState<Service>();
   return (
     <>
       <h1 className="m-5 text-2xl font-bold">Services List</h1>
@@ -38,8 +42,74 @@ export default function ServicesPage() {
         </div>
         <ServicesTable />
       </div>
+      <ServiceModal item={selectedService} />
     </>
   );
+
+  function ServiceModal(props: { item?: Service }) {
+    const [newServiceName, setNewServiceName] = useState<string>();
+    const [newPort, setNewPort] = useState<number>();
+    const handleEditClick = (onClose: Function) => {
+      console.log("SelectedService =>", selectedService);
+      console.log("New Data =>", newServiceName, newPort);
+
+      context?.servicesFunctions
+        ?.editServiceAPI({
+          _id: selectedService?._id,
+          name: newServiceName ? newServiceName : selectedService?.name,
+          port: newPort ? newPort : selectedService?.port,
+        })
+        .then(() => {
+          onClose();
+          toast.success("Success!");
+        });
+    };
+
+    return (
+      <Modal
+        className="dark text-foreground bg-background"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        backdrop="blur"
+        hideCloseButton={true}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Edit service {props.item?._id}
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  type="text"
+                  label="Service name"
+                  placeholder={props.item?.name}
+                  onChange={(e) => setNewServiceName(e.target.value)}
+                />
+                <Input
+                  type="number"
+                  label="Service port"
+                  placeholder={String(props.item?.port)}
+                  onChange={(e) => setNewPort(Number(e.target.value))}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button
+                  onClick={() => handleEditClick(onClose)}
+                  color="primary"
+                >
+                  Edit
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    );
+  }
 
   function ServicesTable() {
     return (
@@ -48,12 +118,12 @@ export default function ServicesPage() {
           <TableColumn className="text-base">NAME</TableColumn>
           <TableColumn className="text-base">ID</TableColumn>
           <TableColumn className="text-base text-center">PORT</TableColumn>
-          <TableColumn className="text-base text-center">STATE</TableColumn>
+          <TableColumn className="text-base text-center">N SCRIPT</TableColumn>
           <TableColumn className="text-base text-center">ACTIONS</TableColumn>
         </TableHeader>
         {services ? (
           services.length == 0 ? (
-            <TableBody emptyContent={"No services providen."}>{[]}</TableBody>
+            <TableBody emptyContent={"No services provided"}>{[]}</TableBody>
           ) : (
             <TableBody>
               {services.map((service) => {
@@ -66,9 +136,16 @@ export default function ServicesPage() {
                     <TableCell className="text-center">
                       {service.port}
                     </TableCell>
-                    <TableCell className="text-center">{"STATE"}</TableCell>
+                    <TableCell className="text-center">
+                      {service.count}
+                    </TableCell>
                     <TableCell className="flex items-center justify-center">
-                      <Action />
+                      <Action
+                        _id={service._id}
+                        name={service.name}
+                        port={service.port}
+                        count={service.count}
+                      />
                     </TableCell>
                   </TableRow>
                 );
@@ -82,16 +159,29 @@ export default function ServicesPage() {
     );
   }
 
-  function Action() {
+  function Action(item: Service) {
     return (
       <div className="relative flex items-center gap-2">
         <Tooltip content="Edit service">
-          <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
+          <span
+            onClick={() => {
+              setSelectedService(item);
+              onOpen();
+            }}
+            className="text-lg cursor-pointer text-default-400 active:opacity-50"
+          >
             <EditIcon />
           </span>
         </Tooltip>
         <Tooltip color="danger" content="Delete service">
-          <span className="text-lg cursor-pointer text-danger active:opacity-50">
+          <span
+            onClick={() => {
+              item
+                ? context?.servicesFunctions?.deleteServiceAPI(item)
+                : toast.error("No selected service");
+            }}
+            className="text-lg cursor-pointer text-danger active:opacity-50"
+          >
             <DeleteIcon />
           </span>
         </Tooltip>
@@ -107,5 +197,7 @@ export default function ServicesPage() {
     );
   }
 }
+
+
 
 

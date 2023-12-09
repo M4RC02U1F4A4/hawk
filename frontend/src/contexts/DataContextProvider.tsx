@@ -11,11 +11,10 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
   const [scripts, setScripts] = useState<Script[]>();
 
   const fetchAllData = async () => {
-    const output = await getServicesAPI();
-    setServices(output);
+    await getServicesAPI();
   };
 
-  const getServicesAPI = async (): Promise<Service[]> => {
+  const getServicesAPI = async () => {
     const resl = await fetch("http://localhost:5001/get/services");
     if (!resl.ok) {
       throw new Error("Failed to get services");
@@ -23,7 +22,7 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
 
     const responseData = await resl.json();
     if (responseData && responseData.data) {
-      return responseData.data;
+      setServices(responseData.data);
     } else {
       throw new Error("Invalid response format");
     }
@@ -32,6 +31,9 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
   const addServiceAPI = async (service: Service) => {
     const resl = await fetch("http://localhost:5001/add/service", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         name: service.name,
         port: service.port,
@@ -42,9 +44,31 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
     }
   };
 
+  const editServiceAPI = async (service: Service) => {
+    const resl = await fetch("http://localhost:5001/edit/service", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: service._id,
+        name: service.name,
+        port: service.port,
+      }),
+    });
+    if (!resl.ok) {
+      throw new Error("Failled to edit service");
+    }
+    getServicesAPI();
+    return true;
+  };
+
   const deleteServiceAPI = async (service: Service) => {
-    const resl = await fetch("", {
+    const resl = await fetch("http://localhost:5001/delete/service", {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         id: service._id,
       }),
@@ -52,6 +76,7 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
     if (!resl.ok) {
       throw new Error("Failled to delete service: " + service._id);
     }
+    getServicesAPI();
   };
 
   useEffect(() => {
@@ -64,7 +89,19 @@ export const DataContextProvider = (props: { children: ReactNode }) => {
   }, []);
 
   return (
-    <DataContext.Provider value={{ services, scripts, loadingState }}>
+    <DataContext.Provider
+      value={{
+        services,
+        scripts,
+        loadingState,
+        servicesFunctions: {
+          addServiceAPI,
+          editServiceAPI,
+          deleteServiceAPI,
+          getServicesAPI,
+        },
+      }}
+    >
       {props.children}
     </DataContext.Provider>
   );

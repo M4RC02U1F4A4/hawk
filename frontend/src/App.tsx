@@ -3,6 +3,7 @@ import { NavBar } from "./components/NavBar";
 
 import { DataContextProvider } from "./contexts/DataContextProvider";
 import ServicesPage from "./pages/services";
+import { ToastContainer } from "react-toastify";
 
 const router = createBrowserRouter([
   { path: "/", element: <div>Home</div> },
@@ -18,6 +19,19 @@ function App() {
         <NavBar />
         <RouterProvider router={router} />
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        closeButton={false}
+        theme="dark"
+      />
     </DataContextProvider>
   );
 }
