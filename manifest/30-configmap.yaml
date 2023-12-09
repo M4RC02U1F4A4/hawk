@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hawk-config
+  namespace: hawk
+data:
+  MONGODB_CONNECTION_STRING: "mongodb://localhost:30017/"
+  FARM_URL: "http://farm:5000"

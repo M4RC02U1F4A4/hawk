@@ -7,11 +7,10 @@ import os
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
-mongo_client = pymongo.MongoClient(f"mongodb://localhost:30017/")
+mongo_client = pymongo.MongoClient(f"{os.getenv('MONGODB_CONNECTION_STRING')}")
 db = mongo_client.hawk
 
 scriptsDB = db['scripts']
-metricsDB = db['metrics']
 configsDB = db['configs']
 servicesDB = db['services']
 
