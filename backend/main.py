@@ -35,7 +35,7 @@ def http_editservice():
     
 @app.route("/get/services", methods=['GET'])
 def http_get_services():
-    return jsonify(extract_services())
+    return jsonify(extract_services()), 200
 
 
 
@@ -67,12 +67,10 @@ def http_get_scripts():
 @app.route("/start/<id>", methods=['GET'])
 def http_start(id):
     return jsonify(create_new_attack("hawk", id), 200)
-    
 
 @app.route("/delete/<id>", methods=['GET'])
 def http_delete(id):
     return jsonify(delete_attack("hawk", id)), 200
-     
 
 @app.route("/status/<id>", methods=['GET'])
 def http_status(id):

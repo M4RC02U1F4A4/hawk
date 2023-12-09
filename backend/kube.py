@@ -7,6 +7,8 @@ def create_new_attack(namespace, script_id):
     config.load_kube_config()
     
     files = extract_script_files(script_id)
+    if not files:
+        return {'status': 'ERROR', 'message':'Script with ID {script_id} not found.'}
     farm_script = extract_farm_script()
     farm_url = extract_farm_url()
     api_instance = client.CoreV1Api()
