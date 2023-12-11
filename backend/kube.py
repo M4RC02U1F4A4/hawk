@@ -1,7 +1,7 @@
 from kubernetes import client, config
-import yaml
 from mongo import extract_script_files, extract_farm_script, extract_farm_url
 import base64
+from datetime import datetime, timezone
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
@@ -95,7 +95,7 @@ def get_status(namespace, script_id):
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if script_id in pod.metadata.name][0]
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase}}
+        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}
     except:
         return {'status': 'ERROR', 'message': 'Error getting pod status.'}
 

@@ -66,7 +66,7 @@ def http_get_scripts():
 
 @app.route("/start/<id>", methods=['GET'])
 def http_start(id):
-    return jsonify(create_new_attack("hawk", id), 200)
+    return jsonify(create_new_attack("hawk", id)), 200
 
 @app.route("/delete/<id>", methods=['GET'])
 def http_delete(id):
