@@ -2,10 +2,7 @@ from kubernetes import client, config
 from mongo import extract_script_files, extract_attack_script, get_flag_regex
 import base64
 from datetime import datetime, timezone
-import os
-
-# MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING')
-MONGODB_CONNECTION_STRING = "mongodb://hawk-db:27017/"
+import env
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
@@ -26,10 +23,10 @@ def create_new_attack(namespace, script_id):
                 'attack_requirements.txt': base64.b64encode(attack_script['requirements']).decode('utf-8')
                 },
             'data': {
-                'FLAG_REGEX': get_flag_regex()['flag_regex'],
-                'MONGODB_CONNECTION_STRING': MONGODB_CONNECTION_STRING,
-                'SCRIPT_PATH': f'/app/{script_id}.py',
-                'SCRIPT_ID': f'{script_id}',
+                'ATTACK_FLAG_REGEX': get_flag_regex()['flag_regex'],
+                'ATTACK_MONGODB_CONNECTION_STRING': env.MONGODB_CONNECTION_STRING,
+                'ATTACK_SCRIPT_PATH': f'/app/{script_id}.py',
+                'ATTACK_SCRIPT_ID': f'{script_id}',
                 'PYTHONUNBUFFERED': '1'
             }
         }

@@ -3,26 +3,28 @@ import logging
 from bson import ObjectId
 import base64
 from bson import Binary
-import os
+import env
 import ipaddress
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
-MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING')
-
-mongo_client = pymongo.MongoClient(f"{MONGODB_CONNECTION_STRING}")
+mongo_client = pymongo.MongoClient(f"{env.MONGODB_CONNECTION_STRING}")
 db = mongo_client.hawk
 
 scriptsDB = db['scripts']
 configsDB = db['configs']
 servicesDB = db['services']
 
+# ------------------------------------------------------------------------------------------
+# Startup functions
+# From here, the script used by the pods is loaded into the DB, the regex to match the flags is added, and the list of IPs to be attacked is generated
 def startup(flag_regex, ip_range, my_ip):
     configsDB.delete_many({})
+    
     logging.debug(f"Adding attack script...")
-    with open('attack.py', 'rb') as file:
+    with open('attack_files/attack.py', 'rb') as file:
         script_binary_data = Binary(file.read())
-    with open('attack_requirements.txt', 'rb') as file:
+    with open('attack_files/attack_requirements.txt', 'rb') as file:
         requirements_binary_data = Binary(file.read())
     entry = {
         "_id":"attack_script",
@@ -34,12 +36,14 @@ def startup(flag_regex, ip_range, my_ip):
     except:
         pass
     logging.debug(f"Attack script added.")
+    
     logging.debug("Adding flag regex...")
     try:
         configsDB.insert_one({"_id":"flag_regex", "regex":flag_regex})
     except:
         return {'status': 'ERROR', 'message': "Error during regex input."}
     logging.debug("Flag regex added.")
+    
     ips = []
     start_ip = ipaddress.IPv4Address(ip_range.split('-')[0])
     end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
@@ -55,6 +59,8 @@ def startup(flag_regex, ip_range, my_ip):
     logging.debug("IPs added.")
     return {'status': 'OK', 'message': f"Startup done.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
 
+# ------------------------------------------------------------------------------------------
+# Function to manage DB data related to services
 def add_new_service(service_name, service_port):
     logging.debug(f"Adding service '{service_name}'...")
     try:
@@ -105,6 +111,8 @@ def extract_services():
         logging.debug("Error extracting services")
         return {'status': 'ERROR', 'message': 'Error extracting services.'}
 
+# ------------------------------------------------------------------------------------------
+# Function to manage DB data related to scripts
 def add_new_script(name, script, requirements, service_id):
     service_id = ObjectId(service_id)
     logging.debug(f"Checking if service with ID '{service_id}' exist")
@@ -154,7 +162,9 @@ def extract_scripts():
     except:
         logging.debug("Error extracting scripts.")
         return {'status': 'ERROR', 'message': 'Error extracting scripts.'}
-    
+
+# ------------------------------------------------------------------------------------------
+# Functions for extracting files needed for configuring attack pods
 def extract_script_files(script_id):
     logging.debug("Extracting script file.")
     return scriptsDB.find_one({"_id":ObjectId(script_id)})

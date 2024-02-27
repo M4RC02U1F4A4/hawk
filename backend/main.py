@@ -5,10 +5,11 @@ from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 CORS(app)
 
+# ------------------------------------------------------------------------------------------
+# API block to manage services
 @app.route("/add/service", methods=['POST'])
 def http_add_new_service():
     if request.is_json:
@@ -37,8 +38,8 @@ def http_editservice():
 def http_get_services():
     return jsonify(extract_services()), 200
 
-
-
+# ------------------------------------------------------------------------------------------
+# API block to manage scripts
 @app.route("/add/script", methods=['POST'])
 def http_add_script():
     user_script = request.files['user_script']
@@ -64,6 +65,8 @@ def http_get_scripts():
     return jsonify(extract_scripts()), 200
 
 
+# ------------------------------------------------------------------------------------------
+# API block to manage the attack scripts
 @app.route("/start/<id>", methods=['GET'])
 def http_start(id):
     return jsonify(create_new_attack("hawk", id)), 200
@@ -80,7 +83,8 @@ def http_status(id):
 def http_logs(id):
     return jsonify(get_logs("hawk", id)), 200
 
-
+# ------------------------------------------------------------------------------------------
+# Hawk startup
 @app.route("/startup", methods=['POST'])
 def http_startup():
     if request.is_json:
