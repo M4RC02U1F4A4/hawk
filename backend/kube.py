@@ -1,7 +1,11 @@
 from kubernetes import client, config
-from mongo import extract_script_files, extract_farm_script, extract_farm_url
+from mongo import extract_script_files, extract_attack_script, get_flag_regex
 import base64
 from datetime import datetime, timezone
+import os
+
+# MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING')
+MONGODB_CONNECTION_STRING = "mongodb://hawk-db:27017/"
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
@@ -9,8 +13,7 @@ def create_new_attack(namespace, script_id):
     files = extract_script_files(script_id)
     if not files:
         return {'status': 'ERROR', 'message':'Script with ID {script_id} not found.'}
-    farm_script = extract_farm_script()
-    farm_url = extract_farm_url()
+    attack_script = extract_attack_script()
     api_instance = client.CoreV1Api()
     config_map = {
             'apiVersion': 'v1',
@@ -18,9 +21,17 @@ def create_new_attack(namespace, script_id):
             'metadata': {'name': f'hawk-script-{script_id}-config'},
             'binaryData': {
                 f'{script_id}.py': base64.b64encode(files['script']).decode('utf-8'),
-                'start_sploit.py': base64.b64encode(farm_script['script']).decode('utf-8'),
                 'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8'),
-                }
+                'attack.py': base64.b64encode(attack_script['script']).decode('utf-8'),
+                'attack_requirements.txt': base64.b64encode(attack_script['requirements']).decode('utf-8')
+                },
+            'data': {
+                'FLAG_REGEX': get_flag_regex()['flag_regex'],
+                'MONGODB_CONNECTION_STRING': MONGODB_CONNECTION_STRING,
+                'SCRIPT_PATH': f'/app/{script_id}.py',
+                'SCRIPT_ID': f'{script_id}',
+                'PYTHONUNBUFFERED': '1'
+            }
         }
     try:
         api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
@@ -36,13 +47,15 @@ def create_new_attack(namespace, script_id):
                 name=f"hawk-script-{script_id}-container",
                 image="python:3.11-slim",
                 command=['bash', '-c'],
-                args=['python3 -m pip install -r /app/requirements.txt && sleep 5 && echo "Starting..." && python3 /app/{script_id}.py'],
-                # args=[f'chmod +x /app/start_sploit.py && python3 -m pip install -r /app/requirements.txt && echo "Starting..." && ./start_sploit.py /app/{script_id}.py -u {farm_url}'],
+                args=['python3 -m pip install -r /app/requirements.txt && python3 -m pip install -r /app/attack_requirements.txt && sleep 5 && echo "Starting..." && python3 /app/attack.py'],
                 volume_mounts=[
                     client.V1VolumeMount(
                         name="config-volume",
                         mount_path="/app"
                     )
+                ],
+                env_from=[
+                    client.V1EnvFromSource(config_map_ref=client.V1ConfigMapEnvSource(name=f"hawk-script-{script_id}-config"))
                 ]
             )
         ],
@@ -54,8 +67,10 @@ def create_new_attack(namespace, script_id):
                     name=f"hawk-script-{script_id}-config",
                     items=[
                         client.V1KeyToPath(key=f"{script_id}.py", path=f"{script_id}.py"),
-                        client.V1KeyToPath(key="start_sploit.py", path="start_sploit.py"),
                         client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
+                        client.V1KeyToPath(key="attack.py", path="attack.py"),
+                        client.V1KeyToPath(key="attack_requirements.txt", path="attack_requirements.txt"),
+                        
                     ]
                 )
             )

@@ -1,14 +1,29 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: hawk-db
+  name: hawk-db-node
   namespace: hawk
 spec:
   type: NodePort
   ports:
-  - name: hawk-db
+  - name: hawk-db-node
     targetPort: 27017
     port: 27017
     nodePort: 30017
+  selector:
+    app: hawk-db
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hawk-db
+  namespace: hawk
+spec:
+  ports:
+  - name: hawk-db
+    targetPort: 27017
+    port: 27017
   selector:
     app: hawk-db

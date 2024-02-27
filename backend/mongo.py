@@ -2,43 +2,57 @@ import pymongo
 import logging
 from bson import ObjectId
 import base64
-import requests
+from bson import Binary
 import os
+import ipaddress
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
-mongo_client = pymongo.MongoClient(f"{os.getenv('MONGODB_CONNECTION_STRING')}")
+MONGODB_CONNECTION_STRING = os.getenv('MONGODB_CONNECTION_STRING')
+
+mongo_client = pymongo.MongoClient(f"{MONGODB_CONNECTION_STRING}")
 db = mongo_client.hawk
 
 scriptsDB = db['scripts']
 configsDB = db['configs']
 servicesDB = db['services']
 
-def config_startup():
+def startup(flag_regex, ip_range):
+    configsDB.delete_many({})
+    logging.debug(f"Adding attack script...")
+    with open('attack.py', 'rb') as file:
+        script_binary_data = Binary(file.read())
+    with open('attack_requirements.txt', 'rb') as file:
+        requirements_binary_data = Binary(file.read())
+    entry = {
+        "_id":"attack_script",
+        "script": script_binary_data,
+        "requirements": requirements_binary_data
+        }
     try:
-        logging.debug(f"Adding farm script...")
-        response = requests.get("https://raw.githubusercontent.com/DestructiveVoice/DestructiveFarm/master/client/start_sploit.py")
-        script = response.content
-        entry = {
-            "_id":"farm_script",
-            "script": script
-            }
         configsDB.insert_one(entry)
-        logging.debug(f"Farm script added.")
-    except Exception as e:
-        logging.debug(f"Error during farm script download.")
-    try:
-        logging.debug(f"Adding farm url...")
-        entry = {
-            "_id":"farm_url",
-            "url": os.getenv('FARM_URL')
-            }
-        configsDB.insert_one(entry)
-        logging.debug(f"Farm script url added.")
     except:
-        logging.debug(f"Error during farm url add.")
-    
-
+        pass
+    logging.debug(f"Attack script added.")
+    logging.debug("Adding flag regex...")
+    try:
+        configsDB.insert_one({"_id":"flag_regex", "regex":flag_regex})
+    except:
+        return {'status': 'ERROR', 'message': "Error during regex input."}
+    logging.debug("Flag regex added.")
+    ips = []
+    start_ip = ipaddress.IPv4Address(ip_range.split('-')[0])
+    end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
+    for ip_int in range(int(start_ip), int(end_ip) + 1):
+        ip = ipaddress.IPv4Address(ip_int)
+        ips.append(str(ip))
+    logging.debug("Adding IPs...")
+    try:
+        configsDB.insert_one({"_id":"ips", "list":ips})
+    except:
+        return {'status': 'ERROR', 'message': "Error during IPs generation."}
+    logging.debug("IPs added.")
+    return {'status': 'OK', 'message': f"Startup done.", "data":{"regex": flag_regex, "ips": ips}}
 
 def add_new_service(service_name, service_port):
     logging.debug(f"Adding service '{service_name}'...")
@@ -144,10 +158,10 @@ def extract_script_files(script_id):
     logging.debug("Extracting script file.")
     return scriptsDB.find_one({"_id":ObjectId(script_id)})
 
-def extract_farm_script():
-    logging.debug("Extracting farm script file.")
-    return configsDB.find_one({"_id": "farm_script"})
+def extract_attack_script():
+    logging.debug("Extracting attack script file.")
+    return configsDB.find_one({"_id": "attack_script"})
 
-def extract_farm_url():
-    logging.debug("Extracting farm url.")
-    return configsDB.find_one({"_id": "farm_url"})
+def get_flag_regex():
+    logging.debug("Exctracting flag regex.")
+    return configsDB.find_one({"_id": "flag_regex"})

@@ -4,5 +4,4 @@ metadata:
   name: hawk-config
   namespace: hawk
 data:
-  MONGODB_CONNECTION_STRING: "mongodb://localhost:30017/"
-  FARM_URL: "http://farm:5000"
+  MONGODB_CONNECTION_STRING: "mongodb://hawk-db:27017/"

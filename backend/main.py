@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, jsonify
 import hashlib
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, config_startup
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup
 from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
 from flask_cors import CORS
 
+
 app = Flask(__name__)
 CORS(app)
-config_startup()
 
 @app.route("/add/service", methods=['POST'])
 def http_add_new_service():
@@ -80,6 +80,14 @@ def http_status(id):
 def http_logs(id):
     return jsonify(get_logs("hawk", id)), 200
 
+
+@app.route("/startup", methods=['POST'])
+def http_startup():
+    if request.is_json:
+        data = request.get_json()
+        if data['flag_regex'] and data['ip_range']:
+            return jsonify(startup(data['flag_regex'], data['ip_range'])), 200
+    return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
 
 
 if __name__ == "__main__":
