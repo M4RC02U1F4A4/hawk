@@ -79,7 +79,7 @@ def http_attack_status(id):
     return jsonify(get_status("hawk", id)), 200
 
 @app.route("/attack/status", methods=['GET'])
-def http_attack_status():
+def http_attack_status_all():
     return jsonify(get_status_all("hawk")), 200
 
 @app.route("/attack/logs/<id>", methods=['GET'])
