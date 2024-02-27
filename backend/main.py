@@ -66,24 +66,24 @@ def http_get_scripts():
 
 # ------------------------------------------------------------------------------------------
 # API block to manage the attack scripts
-@app.route("/start/<id>", methods=['GET'])
-def http_start(id):
+@app.route("/attack/start/<id>", methods=['GET'])
+def http_attack_start(id):
     return jsonify(create_new_attack("hawk", id)), 200
 
-@app.route("/delete/<id>", methods=['GET'])
-def http_delete(id):
+@app.route("/attack/delete/<id>", methods=['GET'])
+def http_attack_delete(id):
     return jsonify(delete_attack("hawk", id)), 200
 
-@app.route("/status/<id>", methods=['GET'])
-def http_status(id):
+@app.route("/attack/status/<id>", methods=['GET'])
+def http_attack_status(id):
     return jsonify(get_status("hawk", id)), 200
 
-@app.route("/status", methods=['GET'])
-def http_status_all():
+@app.route("/attack/status", methods=['GET'])
+def http_attack_status():
     return jsonify(get_status_all("hawk")), 200
 
-@app.route("/logs/<id>", methods=['GET'])
-def http_logs(id):
+@app.route("/attack/logs/<id>", methods=['GET'])
+def http_attack_logs(id):
     return jsonify(get_logs("hawk", id)), 200
 
 # ------------------------------------------------------------------------------------------
