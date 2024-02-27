@@ -17,7 +17,7 @@ scriptsDB = db['scripts']
 configsDB = db['configs']
 servicesDB = db['services']
 
-def startup(flag_regex, ip_range):
+def startup(flag_regex, ip_range, my_ip):
     configsDB.delete_many({})
     logging.debug(f"Adding attack script...")
     with open('attack.py', 'rb') as file:
@@ -45,14 +45,15 @@ def startup(flag_regex, ip_range):
     end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
     for ip_int in range(int(start_ip), int(end_ip) + 1):
         ip = ipaddress.IPv4Address(ip_int)
-        ips.append(str(ip))
+        if str(ip) not in my_ip:
+            ips.append(str(ip))
     logging.debug("Adding IPs...")
     try:
         configsDB.insert_one({"_id":"ips", "list":ips})
     except:
         return {'status': 'ERROR', 'message': "Error during IPs generation."}
     logging.debug("IPs added.")
-    return {'status': 'OK', 'message': f"Startup done.", "data":{"regex": flag_regex, "ips": ips}}
+    return {'status': 'OK', 'message': f"Startup done.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
 
 def add_new_service(service_name, service_port):
     logging.debug(f"Adding service '{service_name}'...")

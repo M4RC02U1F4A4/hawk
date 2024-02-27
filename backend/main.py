@@ -85,8 +85,8 @@ def http_logs(id):
 def http_startup():
     if request.is_json:
         data = request.get_json()
-        if data['flag_regex'] and data['ip_range']:
-            return jsonify(startup(data['flag_regex'], data['ip_range'])), 200
+        if data['flag_regex'] and data['ip_range'] and data['my_ip']:
+            return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'])), 200
     return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
 
 
