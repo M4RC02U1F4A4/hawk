@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, jsonify
-import hashlib
+from flask import Flask, request, jsonify
 from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup
 from kube import create_new_attack, delete_attack, get_status, get_logs
 from bson import Binary
