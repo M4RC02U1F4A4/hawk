@@ -110,6 +110,18 @@ def get_status(namespace, script_id):
         return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}
     except:
         return {'status': 'ERROR', 'message': 'Error getting pod status.'}
+    
+def get_status_all(namespace):
+    config.load_kube_config()
+    api_instance = client.CoreV1Api()
+    try:
+        pod_list = api_instance.list_namespaced_pod(namespace=namespace)
+        data = []
+        for pod in pod_list.items:
+            data.append({'name':pod.metadata.name, 'phase': pod.status.phase, 'uptime': (datetime.now(timezone.utc) - pod.status.start_time).total_seconds()})
+        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':data}
+    except:
+        return {'status': 'ERROR', 'message': 'Error getting pod status.'}
 
 def get_logs(namespace, script_id):
     config.load_kube_config()

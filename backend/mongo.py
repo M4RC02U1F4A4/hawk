@@ -39,7 +39,7 @@ def startup(flag_regex, ip_range, my_ip):
     
     logging.debug("Adding flag regex...")
     try:
-        configsDB.insert_one({"_id":"flag_regex", "regex":flag_regex})
+        configsDB.insert_one({"_id":"flag_regex", "flag_regex":flag_regex})
     except:
         return {'status': 'ERROR', 'message': "Error during regex input."}
     logging.debug("Flag regex added.")
