@@ -1,13 +1,33 @@
 import { useEffect, useState } from "react";
 import { useDataContext } from "../context/Data";
-export const Main = () => {
-  const { servicesData } = useDataContext();
+import NavBar from './components/NavBar';
+import Attacks from './Attacks'
+import Farm from './Farm'
+import Services from './Services'
+import Settings from './Settings'
 
-  const [loading, setLoading] = useState(true);
+export const Main = () => {
+
+  const [activePage, setActivePage] = useState(localStorage.getItem('activePage') || 'attacks');
+
   useEffect(() => {
-    if (servicesData.length > 0) {
-      setLoading(true);
-    }
-  }, [servicesData]);
-  return loading ? <div>Loading</div> : <div>{servicesData[0]._id}</div>;
+    localStorage.setItem('activePage', activePage);
+  }, [activePage]);
+
+  const handleNavLinkClick = (page) => {
+    setActivePage(page);
+  };
+
+  return (
+    <div className='mx-8'>
+        <NavBar activePage={activePage} handleNavLinkClick={handleNavLinkClick} />
+        <div>
+            {activePage === "attacks" && <Attacks />}
+            {activePage === "farm" && <Farm />}
+            {activePage === "services" && <Services />}
+            {activePage === "settings" && <Settings />}
+        </div>
+    </div>
+  );
+  
 };
