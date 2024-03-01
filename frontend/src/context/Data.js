@@ -39,9 +39,14 @@ export const DataProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchServices();
-    fetchScripts();
-    fetchAttackStatus();
+    const fetchData = async () => {
+      await fetchServices();
+      await fetchScripts();
+      await fetchAttackStatus();
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useDataContext } from "../context/Data";
 import NavBar from './components/NavBar';
 import Attacks from './Attacks'
 import Farm from './Farm'

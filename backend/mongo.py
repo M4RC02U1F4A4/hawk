@@ -67,7 +67,7 @@ def add_new_service(service_name, service_port):
         entry = {"name":f"{service_name}", "port": service_port}
         result = servicesDB.insert_one(entry)
         logging.debug(f"Service '{service_name}' added.")
-        return {'status': 'OK', 'message': f"Service '{service_name}' added.", 'data':{'id': f"{result.inserted_id}"}}
+        return {'status': 'OK', 'message': f"Service with ID '{result.inserted_id}' deleted.", 'data':{'id': f"{result.inserted_id}"}}
     except:
         logging.debug(f"Error adding service '{service_name}'.")
         return {'status': 'ERROR', 'message': f"Error adding service '{service_name}'."}
