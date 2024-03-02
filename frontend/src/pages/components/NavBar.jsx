@@ -9,12 +9,12 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function NavBar({ activePage, handleNavLinkClick }) {
 
-    const { startupData, setStartupData } = useDataContext();
+    const { startupData, fetchStartup } = useDataContext();
     const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
     const [loadingStartup, setLoadingStartup] = useState(true);
-    const [flagRegex, setFlagRegex] = useState("NA");
-    const [ipRange, setIpRange] = useState("NA");
-    const [myIp, setMyIp] = useState("NA");
+    const [flagRegex, setFlagRegex] = useState();
+    const [ipRange, setIpRange] = useState();
+    const [myIp, setMyIp] = useState();
 
     useEffect(() => {
         if (startupData.length > 0) {
@@ -26,10 +26,25 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
     }, [startupData]);
 
     const handleSaveSettings = async () => {
+        let flagRegexToSend = flagRegex;
+        let ipRangeToSend = ipRange;
+        let myIpToSend = myIp;
+
+        // Check if input fields are empty, if so, use previous values
+        if (!flagRegex) {
+            flagRegexToSend = startupData.flag_regex;
+        }
+        if (!ipRange) {
+            ipRangeToSend = startupData.ip_range;
+        }
+        if (!myIp) {
+            myIpToSend = startupData.my_ip;
+        }
+        
         const payload = {
-            flag_regex: flagRegex,
-            ip_range: ipRange,
-            my_ip: myIp
+            flag_regex: flagRegexToSend,
+            ip_range: ipRangeToSend,
+            my_ip: myIpToSend
         };
 
         try {
@@ -40,17 +55,17 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                 },
                 body: JSON.stringify(payload)
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                setStartupData(data);
+            const responseData = await response.json();
+            if (response.ok && responseData.status === 'OK') {
                 onClose();
-                toast.success(startupData.message);
+                fetchStartup();
+                toast.success(responseData.message);
             } else {
-                console.error('Error while saving settings:', response.statusText);
+                toast.error(responseData.message || 'Failed to add service');
             }
         } catch (error) {
             console.error('Error while saving settings:', error.message);
+            toast.error('API error');
         }
     };
 

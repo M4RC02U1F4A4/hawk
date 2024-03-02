@@ -5,6 +5,7 @@ import base64
 from bson import Binary
 import env
 import ipaddress
+import re
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
@@ -19,8 +20,32 @@ servicesDB = db['services']
 # Startup functions
 # From here, the script used by the pods is loaded into the DB, the regex to match the flags is added, and the list of IPs to be attacked is generated
 def startup(flag_regex, ip_range, my_ip):
-    configsDB.delete_many({})
+    logging.debug(flag_regex)
+    logging.debug(ip_range)
+    logging.debug(my_ip)
+
+    try:
+        re.compile(flag_regex)
+    except:
+        return {'status': 'ERROR', 'message': "Not a valid regex."}
+
+    try:
+        ip1, ip2 = ip_range.split('-')
+        ip1_obj = ipaddress.ip_address(ip1.strip())
+        ip2_obj = ipaddress.ip_address(ip2.strip())
+        if ip2_obj < ip1_obj:
+            return {'status': 'ERROR', 'message': "Not a valid IP range."}
+    except:
+        return {'status': 'ERROR', 'message': "Not a valid IP range."}
     
+    try:
+        team_ip = ipaddress.ip_address(my_ip)
+        if not ip1_obj < team_ip < ip2_obj:
+            return {'status': 'ERROR', 'message': "Team IP outside of the specified IP range."}
+    except:
+        return {'status': 'ERROR', 'message': "Not a valid IP."}
+    
+    configsDB.delete_many({})
     logging.debug(f"Adding attack script...")
     with open('attack_files/attack.py', 'rb') as file:
         script_binary_data = Binary(file.read())
@@ -34,7 +59,7 @@ def startup(flag_regex, ip_range, my_ip):
     try:
         configsDB.insert_one(entry)
     except:
-        pass
+        return {'status': 'ERROR', 'message': "Error inserting attack script."}
     logging.debug(f"Attack script added.")
     
     logging.debug("Adding flag regex...")
@@ -45,14 +70,14 @@ def startup(flag_regex, ip_range, my_ip):
     logging.debug("Flag regex added.")
     
     ips = []
-    start_ip = ipaddress.IPv4Address(ip_range.split('-')[0])
-    end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
-    for ip_int in range(int(start_ip), int(end_ip) + 1):
-        ip = ipaddress.IPv4Address(ip_int)
-        if str(ip) not in my_ip:
-            ips.append(str(ip))
     logging.debug("Adding IPs...")
     try:
+        start_ip = ipaddress.IPv4Address(ip_range.split('-')[0])
+        end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
+        for ip_int in range(int(start_ip), int(end_ip) + 1):
+            ip = ipaddress.IPv4Address(ip_int)
+            if str(ip) not in my_ip:
+                ips.append(str(ip))
         configsDB.insert_one({"_id":"ips", "list":ips})
         configsDB.insert_one({"_id":"my_ip", "ip":my_ip})
     except:
