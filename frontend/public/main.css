@@ -856,12 +856,12 @@ video {
   margin-top: 0.25rem;
 }
 
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
 .mt-10 {
   margin-top: 2.5rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
 }
 
 .box-border {
@@ -1101,6 +1101,10 @@ video {
   width: 0.375rem;
 }
 
+.w-1\/2 {
+  width: 50%;
+}
+
 .w-10 {
   width: 2.5rem;
 }
@@ -1195,22 +1199,6 @@ video {
 
 .w-unit-8 {
   width: var(--nextui-spacing-unit-8);
-}
-
-.w-4\/5 {
-  width: 80%;
-}
-
-.w-3\/5 {
-  width: 60%;
-}
-
-.w-3\/4 {
-  width: 75%;
-}
-
-.w-1\/2 {
-  width: 50%;
 }
 
 .min-w-10 {
@@ -2504,16 +2492,6 @@ video {
   line-height: 1.75rem;
 }
 
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
-.text-base {
-  font-size: 1rem;
-  line-height: 1.5rem;
-}
-
 .font-bold {
   font-weight: 700;
 }
@@ -3242,7 +3220,7 @@ video {
 
 .dark,[data-theme="dark"] {
   color-scheme: dark;
-  --nextui-background: 0 0% 0%;
+  --nextui-background: 220 31% 11%;
   --nextui-foreground-50: 240 6% 10%;
   --nextui-foreground-100: 240 4% 16%;
   --nextui-foreground-200: 240 5% 26%;
@@ -3266,30 +3244,19 @@ video {
   --nextui-content3-foreground: 240 6% 90%;
   --nextui-content4: 240 5% 34%;
   --nextui-content4-foreground: 240 5% 84%;
-  --nextui-default-50: 240 6% 10%;
-  --nextui-default-100: 240 4% 16%;
-  --nextui-default-200: 240 5% 26%;
-  --nextui-default-300: 240 5% 34%;
-  --nextui-default-400: 240 4% 46%;
-  --nextui-default-500: 240 5% 65%;
-  --nextui-default-600: 240 5% 84%;
-  --nextui-default-700: 240 6% 90%;
-  --nextui-default-800: 240 5% 96%;
-  --nextui-default-900: 0 0% 98%;
+  --nextui-default-50: 203 69% 5%;
+  --nextui-default-100: 208 39% 15%;
+  --nextui-default-200: 207 35% 25%;
+  --nextui-default-300: 204 34% 35%;
+  --nextui-default-400: 203 34% 45%;
+  --nextui-default-500: 200 34% 55%;
+  --nextui-default-600: 198 35% 65%;
+  --nextui-default-700: 195 34% 75%;
+  --nextui-default-800: 194 39% 85%;
+  --nextui-default-900: 189 77% 95%;
   --nextui-default-foreground: 0 0% 100%;
   --nextui-default: 240 5% 26%;
-  --nextui-primary-50: 212 100% 10%;
-  --nextui-primary-100: 212 100% 19%;
-  --nextui-primary-200: 212 100% 29%;
-  --nextui-primary-300: 212 100% 38%;
-  --nextui-primary-400: 212 100% 47%;
-  --nextui-primary-500: 212 92% 58%;
-  --nextui-primary-600: 212 92% 69%;
-  --nextui-primary-700: 212 92% 79%;
-  --nextui-primary-800: 212 92% 90%;
-  --nextui-primary-900: 213 92% 95%;
-  --nextui-primary-foreground: 0 0% 100%;
-  --nextui-primary: 212 100% 47%;
+  --nextui-primary: 183 97% 55%;
   --nextui-secondary-50: 270 67% 9%;
   --nextui-secondary-100: 270 67% 19%;
   --nextui-secondary-200: 270 67% 28%;
@@ -3302,42 +3269,10 @@ video {
   --nextui-secondary-900: 270 62% 95%;
   --nextui-secondary-foreground: 0 0% 100%;
   --nextui-secondary: 270 59% 58%;
-  --nextui-success-50: 146 78% 9%;
-  --nextui-success-100: 146 80% 17%;
-  --nextui-success-200: 146 79% 26%;
-  --nextui-success-300: 146 80% 35%;
-  --nextui-success-400: 146 79% 44%;
-  --nextui-success-500: 146 62% 55%;
-  --nextui-success-600: 146 63% 66%;
-  --nextui-success-700: 146 62% 77%;
-  --nextui-success-800: 146 61% 89%;
-  --nextui-success-900: 147 64% 95%;
-  --nextui-success-foreground: 0 0% 0%;
-  --nextui-success: 146 79% 44%;
-  --nextui-warning-50: 37 75% 11%;
-  --nextui-warning-100: 37 75% 22%;
-  --nextui-warning-200: 37 74% 33%;
-  --nextui-warning-300: 37 74% 44%;
-  --nextui-warning-400: 37 91% 55%;
-  --nextui-warning-500: 37 91% 64%;
-  --nextui-warning-600: 37 91% 73%;
-  --nextui-warning-700: 37 91% 82%;
-  --nextui-warning-800: 37 91% 91%;
-  --nextui-warning-900: 55 92% 95%;
-  --nextui-warning-foreground: 0 0% 0%;
-  --nextui-warning: 37 91% 55%;
-  --nextui-danger-50: 340 85% 10%;
-  --nextui-danger-100: 339 87% 20%;
-  --nextui-danger-200: 339 86% 31%;
-  --nextui-danger-300: 339 87% 41%;
-  --nextui-danger-400: 339 90% 51%;
-  --nextui-danger-500: 339 90% 61%;
-  --nextui-danger-600: 339 91% 71%;
-  --nextui-danger-700: 339 90% 80%;
-  --nextui-danger-800: 340 92% 90%;
-  --nextui-danger-900: 339 92% 95%;
-  --nextui-danger-foreground: 0 0% 100%;
-  --nextui-danger: 339 90% 51%;
+  --nextui-success: 116 59% 46%;
+  --nextui-warning: 52 100% 50%;
+  --nextui-danger: 0 74% 45%;
+  --nextui-info: 221 100% 66%;
   --nextui-spacing-unit: 4px;
   --nextui-spacing-unit-0: 0px;
   --nextui-spacing-unit-1: 0.25rem;
@@ -6802,12 +6737,6 @@ video {
 @media (min-width: 768px) {
   .md\:flex-nowrap {
     flex-wrap: nowrap;
-  }
-}
-
-@media (min-width: 1024px) {
-  .lg\:flex {
-    display: flex;
   }
 }
 

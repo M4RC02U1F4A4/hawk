@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import config from "../config";
+import { ToastContainer, toast, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const DataContext = createContext();
 
 export const useDataContext = () => useContext(DataContext);
@@ -17,6 +19,7 @@ export const DataProvider = ({ children }) => {
       setServicesData(servicesData.data);
     } catch (error) {
       console.error("Services API request error:", error);
+      toast.error('Services API error');
     }
   };
 
@@ -27,6 +30,7 @@ export const DataProvider = ({ children }) => {
       setScriptsData(scriptsData.data);
     } catch (error) {
       console.error("Scripts API request error:", error);
+      toast.error('Scripts API error');
     }
   };
   const fetchAttackStatus = async () => {
@@ -36,6 +40,7 @@ export const DataProvider = ({ children }) => {
       setAttackStatusData(attackStatusData.data);
     } catch (error) {
       console.error("Attacks status API request error:", error);
+      toast.error('Attacks API error');
     }
   };
   const fetchStartup = async () => {
@@ -45,6 +50,7 @@ export const DataProvider = ({ children }) => {
       setStartupData(startupData.data);
     } catch (error) {
       console.error("Startup variables API request error:", error);
+      toast.error('Startup variables API error');
     }
   };
 
