@@ -64,11 +64,11 @@ def get_startup():
     try:
         flag_regex = configsDB.find_one({"_id":"flag_regex"})['flag_regex']
         logging.debug(flag_regex)
-        ip_range = configsDB.find_one({"_id":"ips"})["list"]
+        ip_range = configsDB.find_one({"_id":"ips"})['list']
         logging.debug(ip_range)
         my_ip = configsDB.find_one({"_id":"my_ip"})['ip']
         logging.debug(my_ip)
-        return {'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": ip_range, "my_ip": my_ip}}
+        return {'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": f"{ip_range[0]}-{ip_range[-1]}", "my_ip": my_ip}}
     except:
         return {'status': 'ERROR', 'message': "Error getting startup variables."}
 

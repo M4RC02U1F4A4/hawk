@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDataContext } from '../context/Data';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
-import {Modal, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input} from "@nextui-org/react";
+import { Modal, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
 import { ToastContainer, toast, Zoom } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import config from "../config";
 
-import 'react-toastify/dist/ReactToastify.css';
 
 export default function Services() {
 
@@ -129,7 +129,7 @@ export default function Services() {
                             <Input label="Port" value={servicePort} onChange={(e) => setServicePort(e.target.value)} onKeyDown={(e) => handleKeyPress(e)}/>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="error" onPress={onClose}> Cancel </Button>
+                            <Button color="danger" variant="light" onPress={onClose}> Cancel </Button>
                             <Button color='primary' onClick={handleAddService}> Add </Button>
                         </ModalFooter>
                     </>

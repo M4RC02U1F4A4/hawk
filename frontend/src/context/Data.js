@@ -8,6 +8,7 @@ export const DataProvider = ({ children }) => {
   const [servicesData, setServicesData] = useState({});
   const [scriptsData, setScriptsData] = useState({});
   const [attackStatusData, setAttackStatusData] = useState({});
+  const [startupData, setStartupData] = useState({});
 
   const fetchServices = async () => {
     try {
@@ -15,7 +16,7 @@ export const DataProvider = ({ children }) => {
       const servicesData = await response.json();
       setServicesData(servicesData.data);
     } catch (error) {
-      console.error("Errore nella richiesta API per i services:", error);
+      console.error("Services API request error:", error);
     }
   };
 
@@ -25,7 +26,7 @@ export const DataProvider = ({ children }) => {
       const scriptsData = await response.json();
       setScriptsData(scriptsData.data);
     } catch (error) {
-      console.error("Errore nella richiesta API per gli scripts:", error);
+      console.error("Scripts API request error:", error);
     }
   };
   const fetchAttackStatus = async () => {
@@ -34,7 +35,16 @@ export const DataProvider = ({ children }) => {
       const attackStatusData = await response.json();
       setAttackStatusData(attackStatusData.data);
     } catch (error) {
-      console.error("Errore nella richiesta API per gli scripts:", error);
+      console.error("Attacks status API request error:", error);
+    }
+  };
+  const fetchStartup = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/startup`);
+      const startupData = await response.json();
+      setStartupData(startupData.data);
+    } catch (error) {
+      console.error("Startup variables API request error:", error);
     }
   };
 
@@ -43,6 +53,7 @@ export const DataProvider = ({ children }) => {
       await fetchServices();
       await fetchScripts();
       await fetchAttackStatus();
+      await fetchStartup();
     };
     fetchData();
     const interval = setInterval(fetchData, 5000);
@@ -58,6 +69,8 @@ export const DataProvider = ({ children }) => {
         fetchScripts,
         attackStatusData,
         fetchAttackStatus,
+        startupData,
+        fetchStartup
       }}>
       {children}
     </DataContext.Provider>
