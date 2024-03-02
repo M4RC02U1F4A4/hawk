@@ -54,10 +54,24 @@ def startup(flag_regex, ip_range, my_ip):
     logging.debug("Adding IPs...")
     try:
         configsDB.insert_one({"_id":"ips", "list":ips})
+        configsDB.insert_one({"_id":"my_ip", "ip":my_ip})
     except:
         return {'status': 'ERROR', 'message': "Error during IPs generation."}
     logging.debug("IPs added.")
     return {'status': 'OK', 'message': f"Startup done.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
+
+def get_startup():
+    try:
+        flag_regex = configsDB.find_one({"_id":"flag_regex"})['flag_regex']
+        logging.debug(flag_regex)
+        ip_range = configsDB.find_one({"_id":"ips"})["list"]
+        logging.debug(ip_range)
+        my_ip = configsDB.find_one({"_id":"my_ip"})['ip']
+        logging.debug(my_ip)
+        return {'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": ip_range, "my_ip": my_ip}}
+    except:
+        return {'status': 'ERROR', 'message': "Error getting startup variables."}
+
 
 # ------------------------------------------------------------------------------------------
 # Function to manage DB data related to services

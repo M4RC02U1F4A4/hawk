@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup
 from kube import create_new_attack, delete_attack, get_status, get_status_all, get_logs
 from bson import Binary
 from flask_cors import CORS
@@ -88,13 +88,16 @@ def http_attack_logs(id):
 
 # ------------------------------------------------------------------------------------------
 # Hawk startup
-@app.route("/startup", methods=['POST'])
+@app.route("/startup", methods=['GET', 'POST'])
 def http_startup():
-    if request.is_json:
-        data = request.get_json()
-        if data['flag_regex'] and data['ip_range'] and data['my_ip']:
-            return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'])), 200
-    return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
+    if request.method == 'POST':
+        if request.is_json:
+            data = request.get_json()
+            if data['flag_regex'] and data['ip_range'] and data['my_ip']:
+                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'])), 200
+        return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
+    elif request.method == 'GET':
+        return jsonify(get_startup()), 200
 
 
 if __name__ == "__main__":
