@@ -70,60 +70,101 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
     };
 
     return (
-        <>
+      <>
         <Navbar maxWidth="full" isBordered>
-            <NavbarBrand>
-                <a className="font-bold text-inherit" href="/" >HAWK</a>
-            </NavbarBrand>
-            <NavbarContent className="sm:bassis-full gap-4" justify='center'>
-                <NavbarItem isActive={activePage === "attacks"}>
-                    <Link className="cursor-pointer" color={activePage === "attacks" ? "primary" : "foreground"} onClick={() => handleNavLinkClick("attacks")}>
-                        Attacks
-                    </Link>
-                </NavbarItem>
-                <NavbarItem isActive={activePage === "farm"}>
-                    <Link className="cursor-pointer" color={activePage === "farm" ? "primary" : "foreground"} onClick={() => handleNavLinkClick("farm")}>
-                        Farm
-                    </Link>
-                </NavbarItem>
-                <NavbarItem isActive={activePage === "services"}>
-                    <Link className="cursor-pointer" color={activePage === "services" ? "primary" : "foreground"} onClick={() => handleNavLinkClick("services")}>
-                        Services
-                    </Link>
-                </NavbarItem>
+          <NavbarBrand className="m-0">
+            <a className="font-bold text-inherit" href="/">
+              HAWK
+            </a>
+            <NavbarContent className="ml-10" justify="start">
+              <NavbarItem isActive={activePage === "attacks"}>
+                <Link
+                  className="cursor-pointer"
+                  color={activePage === "attacks" ? "primary" : "foreground"}
+                  onClick={() => handleNavLinkClick("attacks")}>
+                  Attacks
+                </Link>
+              </NavbarItem>
+              <NavbarItem isActive={activePage === "farm"}>
+                <Link
+                  className="cursor-pointer"
+                  color={activePage === "farm" ? "primary" : "foreground"}
+                  onClick={() => handleNavLinkClick("farm")}>
+                  Farm
+                </Link>
+              </NavbarItem>
+              <NavbarItem isActive={activePage === "services"}>
+                <Link
+                  className="cursor-pointer"
+                  color={activePage === "services" ? "primary" : "foreground"}
+                  onClick={() => handleNavLinkClick("services")}>
+                  Services
+                </Link>
+              </NavbarItem>
             </NavbarContent>
-            <NavbarContent justify="end">
-                <NavbarItem isActive={activePage === "settings"}>
-                <Button className="antialiased font-semibold" color="primary" variant="ghost" onPress={onOpen}> Settings </Button>
-                </NavbarItem>
-            </NavbarContent>
+          </NavbarBrand>
+          <NavbarContent justify="end">
+            <NavbarItem isActive={activePage === "settings"}>
+              <Button
+                className="antialiased font-semibold"
+                color="primary"
+                variant="ghost"
+                onPress={onOpen}>
+                {" "}
+                Settings{" "}
+              </Button>
+            </NavbarItem>
+          </NavbarContent>
         </Navbar>
-        <Modal size="4xl" isOpen={isOpen} onOpenChange={onOpenChange} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">Settings</ModalHeader>
-              <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="Flag regex" placeholder={loadingStartup ? startupData.flag_regex : ""} onChange={(e) => setFlagRegex(e.target.value)}/>
-                </div>
-                <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="IP Range" placeholder={loadingStartup ? startupData.ip_range : ""} onChange={(e) => setIpRange(e.target.value)}/>
-                    <Input type="text" label="Team IP" placeholder={loadingStartup ? startupData.my_ip : ""} onChange={(e) => setMyIp(e.target.value)}/>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Close
-                </Button>
-                <Button color="primary" onPress={handleSaveSettings}>
-                  Save
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-        </>
-    )
+        <Modal
+          size="4xl"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          className="dark text-foreground bg-background"
+          backdrop="blur"
+          hideCloseButton>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Settings
+                </ModalHeader>
+                <ModalBody>
+                  <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
+                    <Input
+                      type="text"
+                      label="Flag regex"
+                      placeholder={loadingStartup ? startupData.flag_regex : ""}
+                      onChange={(e) => setFlagRegex(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
+                    <Input
+                      type="text"
+                      label="IP Range"
+                      placeholder={loadingStartup ? startupData.ip_range : ""}
+                      onChange={(e) => setIpRange(e.target.value)}
+                    />
+                    <Input
+                      type="text"
+                      label="Team IP"
+                      placeholder={loadingStartup ? startupData.my_ip : ""}
+                      onChange={(e) => setMyIp(e.target.value)}
+                    />
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Close
+                  </Button>
+                  <Button color="primary" onPress={handleSaveSettings}>
+                    Save
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </>
+    );
 }
