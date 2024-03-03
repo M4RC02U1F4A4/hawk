@@ -62,6 +62,8 @@ export default function Services() {
                 fetchServices();
                 onClose();
                 toast.success(responseData.message);
+                setServiceName('');
+                setServicePort('');
             } else {
                 toast.error(responseData.message || 'Failed to add service');
             }

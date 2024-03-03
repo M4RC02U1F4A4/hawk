@@ -2496,6 +2496,11 @@ video {
   line-height: var(--nextui-line-height-large);
 }
 
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
 .text-medium {
   font-size: var(--nextui-font-size-medium);
   line-height: var(--nextui-line-height-medium);
@@ -4673,6 +4678,10 @@ video {
 
 .active\:\!opacity-70:active {
   opacity: 0.7 !important;
+}
+
+.active\:opacity-50:active {
+  opacity: 0.5;
 }
 
 .active\:opacity-disabled:active {
