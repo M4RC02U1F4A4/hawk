@@ -153,7 +153,7 @@ def extract_services():
 
 # ------------------------------------------------------------------------------------------
 # Function to manage DB data related to scripts
-def add_new_script(name, script, requirements, service_id):
+def add_new_script(name, script, requirements, service_id, username):
     service_id = ObjectId(service_id)
     logging.debug(f"Checking if service with ID '{service_id}' exist")
     if not servicesDB.find_one({"_id":service_id}):
@@ -167,7 +167,8 @@ def add_new_script(name, script, requirements, service_id):
         "name": name,
         "script": script,
         "requirements": requirements,
-        "service": service_id
+        "service": service_id,
+        "username": username
     }
     try:
         result = scriptsDB.insert_one(entry)

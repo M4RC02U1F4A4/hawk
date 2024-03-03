@@ -73,7 +73,7 @@ export default function Attacks() {
                     if (phase !== 'Running' && phase !== 'Failed') {
                         await new Promise(resolve => setTimeout(resolve, 1000));
                     }
-                }
+            }
             setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
             toast.success(responseData.message);
             fetchAttackStatus();
@@ -199,6 +199,7 @@ export default function Attacks() {
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>ID</TableColumn>
                         <TableColumn>SERVICE</TableColumn>
+                        <TableColumn>USERNAME</TableColumn>
                         <TableColumn>FLAGS</TableColumn>
                         <TableColumn>AGE</TableColumn>
                         <TableColumn>STATUS</TableColumn>
@@ -220,6 +221,7 @@ export default function Attacks() {
                         <TableColumn>ID</TableColumn>
                         <TableColumn>SERVICE NAME</TableColumn>
                         <TableColumn>SERVICE ID</TableColumn>
+                        <TableColumn className='text-center'>USERNAME</TableColumn>
                         <TableColumn className='text-center'>FLAGS</TableColumn>
                         <TableColumn className='text-center'>AGE</TableColumn>
                         <TableColumn className='text-center'>STATUS</TableColumn>
@@ -233,6 +235,7 @@ export default function Attacks() {
                                 <TableCell className='font-mono'>{scripts._id}</TableCell>
                                 <TableCell className='font-mono'>{getServiceName(scripts.service)}</TableCell>
                                 <TableCell className='font-mono'>{scripts.service}</TableCell>
+                                <TableCell className='font-mono text-center uppercase'>{scripts.username}</TableCell>
                                 <TableCell className='font-mono text-center'>{scripts.flags}</TableCell>
                                 <TableCell className='font-mono text-center'>{getStatusAndUptimeById(scripts._id)['uptime']}</TableCell>
                                 <TableCell className='font-mono text-center'>

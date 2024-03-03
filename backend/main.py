@@ -45,11 +45,12 @@ def http_add_script():
     service_id = request.form.get('service')
     script_name = request.form.get('name')
     user_requirements = request.files['user_requirements']
+    username = request.form.get('username')
 
     user_script_binary = Binary(user_script.read())
     user_requirements_binary = Binary(user_requirements.read())
 
-    return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id), 200
+    return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
 
 @app.route("/delete/script", methods=['DELETE'])
 def http_delete_script():
