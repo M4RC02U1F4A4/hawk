@@ -6,76 +6,74 @@ import env
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
-    
-    files = extract_script_files(script_id)
-    if not files:
-        return {'status': 'ERROR', 'message':'Script with ID {script_id} not found.'}
-    attack_script = extract_attack_script()
-    api_instance = client.CoreV1Api()
-    config_map = {
-            'apiVersion': 'v1',
-            'kind': 'ConfigMap',
-            'metadata': {'name': f'hawk-script-{script_id}-config'},
-            'binaryData': {
-                f'{script_id}.py': base64.b64encode(files['script']).decode('utf-8'),
-                'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8'),
-                'attack.py': base64.b64encode(attack_script['script']).decode('utf-8'),
-                'attack_requirements.txt': base64.b64encode(attack_script['requirements']).decode('utf-8')
-                },
-            'data': {
-                'ATTACK_FLAG_REGEX': get_flag_regex()['flag_regex'],
-                'ATTACK_MONGODB_CONNECTION_STRING': env.MONGODB_CONNECTION_STRING,
-                'ATTACK_SCRIPT_PATH': f'/app/{script_id}.py',
-                'ATTACK_SCRIPT_ID': f'{script_id}',
-                'PYTHONUNBUFFERED': '1'
-            }
-        }
     try:
+        files = extract_script_files(script_id)
+        if not files:
+            return {'status': 'ERROR', 'message':'Script with ID {script_id} not found.'}
+        attack_script = extract_attack_script()
+        api_instance = client.CoreV1Api()
+        config_map = {
+                'apiVersion': 'v1',
+                'kind': 'ConfigMap',
+                'metadata': {'name': f'hawk-script-{script_id}-config'},
+                'binaryData': {
+                    f'{script_id}.py': base64.b64encode(files['script']).decode('utf-8'),
+                    'requirements.txt': base64.b64encode(files['requirements']).decode('utf-8'),
+                    'attack.py': base64.b64encode(attack_script['script']).decode('utf-8'),
+                    'attack_requirements.txt': base64.b64encode(attack_script['requirements']).decode('utf-8')
+                    },
+                'data': {
+                    'ATTACK_FLAG_REGEX': get_flag_regex()['flag_regex'],
+                    'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
+                    'ATTACK_SCRIPT_PATH': f'/app/{script_id}.py',
+                    'ATTACK_SCRIPT_ID': f'{script_id}',
+                    'PYTHONUNBUFFERED': '1'
+                }
+            }
         api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
     except:
         return {'status': 'ERROR', 'message': 'Error creating config map.'} 
-
-    pod = client.V1Pod(
-    metadata=client.V1ObjectMeta(name=f"hawk-script-{script_id}"),
-    spec=client.V1PodSpec(
-        restart_policy="Never",
-        containers=[
-            client.V1Container(
-                name=f"hawk-script-{script_id}-container",
-                image="python:3.11-slim",
-                command=['bash', '-c'],
-                args=['python3 -m pip install -r /app/requirements.txt && python3 -m pip install -r /app/attack_requirements.txt && sleep 5 && echo "Starting..." && python3 /app/attack.py'],
-                volume_mounts=[
-                    client.V1VolumeMount(
-                        name="config-volume",
-                        mount_path="/app"
-                    )
-                ],
-                env_from=[
-                    client.V1EnvFromSource(config_map_ref=client.V1ConfigMapEnvSource(name=f"hawk-script-{script_id}-config"))
-                ]
-            )
-        ],
-        termination_grace_period_seconds=10,
-        volumes=[
-            client.V1Volume(
-                name="config-volume",
-                config_map=client.V1ConfigMapVolumeSource(
-                    name=f"hawk-script-{script_id}-config",
-                    items=[
-                        client.V1KeyToPath(key=f"{script_id}.py", path=f"{script_id}.py"),
-                        client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
-                        client.V1KeyToPath(key="attack.py", path="attack.py"),
-                        client.V1KeyToPath(key="attack_requirements.txt", path="attack_requirements.txt"),
-                        
+    
+    try:
+        pod = client.V1Pod(
+        metadata=client.V1ObjectMeta(name=f"hawk-script-{script_id}"),
+        spec=client.V1PodSpec(
+            restart_policy="Never",
+            containers=[
+                client.V1Container(
+                    name=f"hawk-script-{script_id}-container",
+                    image="python:3.11-slim",
+                    command=['bash', '-c'],
+                    args=['python3 -m pip install -r /app/requirements.txt && python3 -m pip install -r /app/attack_requirements.txt && sleep 5 && echo "Starting..." && python3 /app/attack.py'],
+                    volume_mounts=[
+                        client.V1VolumeMount(
+                            name="config-volume",
+                            mount_path="/app"
+                        )
+                    ],
+                    env_from=[
+                        client.V1EnvFromSource(config_map_ref=client.V1ConfigMapEnvSource(name=f"hawk-script-{script_id}-config"))
                     ]
                 )
-            )
-        ]
-    )
-    )
-
-    try:
+            ],
+            termination_grace_period_seconds=10,
+            volumes=[
+                client.V1Volume(
+                    name="config-volume",
+                    config_map=client.V1ConfigMapVolumeSource(
+                        name=f"hawk-script-{script_id}-config",
+                        items=[
+                            client.V1KeyToPath(key=f"{script_id}.py", path=f"{script_id}.py"),
+                            client.V1KeyToPath(key="requirements.txt", path="requirements.txt"),
+                            client.V1KeyToPath(key="attack.py", path="attack.py"),
+                            client.V1KeyToPath(key="attack_requirements.txt", path="attack_requirements.txt"),
+                            
+                        ]
+                    )
+                )
+            ]
+        )
+        )
         api_instance.create_namespaced_pod(namespace=namespace, body=pod)
     except:
         api_instance.delete_namespaced_config_map(namespace=namespace, body=config_map)
