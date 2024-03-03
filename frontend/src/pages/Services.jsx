@@ -84,6 +84,7 @@ export default function Services() {
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>ID</TableColumn>
+                        <TableColumn>SCRIPTS</TableColumn>
                         <TableColumn>PORT</TableColumn>
                         <TableColumn>ACTION</TableColumn>
                     </TableHeader>
@@ -101,6 +102,7 @@ export default function Services() {
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>ID</TableColumn>
+                        <TableColumn className='text-center'>SCRIPTS</TableColumn>
                         <TableColumn className='text-center'>PORT</TableColumn>
                         <TableColumn className='text-center'>ACTION</TableColumn>
                     </TableHeader>
@@ -109,6 +111,7 @@ export default function Services() {
                             <TableRow key={index}>
                                 <TableCell className='font-bold'>{service.name}</TableCell>
                                 <TableCell className='font-mono'>{service._id}</TableCell>
+                                <TableCell className='font-mono text-center'>{service.count}</TableCell>
                                 <TableCell className='font-mono text-center'>{service.port}</TableCell>
                                 <TableCell className='text-center'><Button color="danger" variant='ghost' onClick={() => handleRemoveService(service._id)}>Remove</Button></TableCell>
                             </TableRow>
