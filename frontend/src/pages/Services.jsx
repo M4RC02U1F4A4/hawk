@@ -145,6 +145,23 @@ export default function Services() {
                 <div className='flex justify-center mt-10'>
                     <Button className=" w-1/2" color="primary" variant='ghost' fullWidth="true" onPress={onOpenAddService}>ADD</Button>
                 </div>
+                <Modal isOpen={isOpenAddService} onOpenChange={onOpenChangeAddService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
+                <ModalContent>
+                {(onCloseAddService) => (
+                    <>
+                        <ModalHeader>Add Service</ModalHeader>
+                        <ModalBody>
+                            <Input label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
+                            <Input label="Port" value={servicePort} onChange={(e) => setServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="danger" variant="light" onPress={onCloseAddService}> Cancel </Button>
+                            <Button color='primary' onClick={handleAddService}> Add </Button>
+                        </ModalFooter>
+                    </>
+                )}
+                </ModalContent>
+            </Modal>
             </>
         );
     }
