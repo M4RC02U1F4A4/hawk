@@ -199,11 +199,12 @@ export default function Attacks() {
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>ID</TableColumn>
                         <TableColumn>SERVICE</TableColumn>
-                        <TableColumn>USERNAME</TableColumn>
-                        <TableColumn>FLAGS</TableColumn>
-                        <TableColumn>AGE</TableColumn>
-                        <TableColumn>STATUS</TableColumn>
-                        <TableColumn>ACTIONS</TableColumn>
+                        <TableColumn className='text-center'>USERNAME</TableColumn>
+                        <TableColumn className='text-center'>FLAGS</TableColumn>
+                        <TableColumn className='text-center'>AGE</TableColumn>
+                        <TableColumn className='text-center'>STATUS</TableColumn>
+                        <TableColumn className='text-center'>ATTACK</TableColumn>
+                        <TableColumn className='text-center'>ACTIONS</TableColumn>
                     </TableHeader>
                     <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
                 </Table>
