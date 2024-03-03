@@ -3,3 +3,4 @@ pymongo
 gunicorn
 kubernetes
 ipaddress
+Flask-Cors
