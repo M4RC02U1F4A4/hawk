@@ -84,7 +84,19 @@ module.exports = {
             50: '#1a1c00',
             DEFAULT: "#FFDC00"
           },
-          background: "#141a26",
+          background: {
+            900: '#ebedfc',
+            800: '#cdcfe5',
+            700: '#acb2d0',
+            600: '#8c95bd',
+            500: '#6c78ab',
+            400: '#536191',
+            300: '#404d72',
+            200: '#2e3852',
+            100: '#1a2232',
+            50: '#070a15',
+            DEFAULT: "#141a26" 
+          },
           default: 
           {
             900: '#e8f9fc',

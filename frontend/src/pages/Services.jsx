@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDataContext } from '../context/Data';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@nextui-org/react";
 import { Modal, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
-import { ToastContainer, toast, Zoom } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import config from "../config";
 
@@ -136,7 +136,6 @@ export default function Services() {
                 )}
                 </ModalContent>
             </Modal>
-            <ToastContainer closeButton={false} position="bottom-right" autoClose={2500} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable={false} pauseOnHover={false} theme="dark" transition={Zoom} />
         </>
     )
 }

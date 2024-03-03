@@ -28,6 +28,30 @@ code {
   align-items: center;
 }
 
+:root {
+  --toastify-color-light: #fff !important;
+  --toastify-color-dark: #172735 !important;
+  --toastify-color-info: #5188FF !important;
+  --toastify-color-success: #3ABC31 !important;
+  --toastify-color-warning: #FFDC00 !important;
+  --toastify-color-error: #c91e1e !important;
+  --toastify-color-transparent: rgba(255, 255, 255, 0.7) !important;
+  --toastify-icon-color-info: var(--toastify-color-info) !important;
+  --toastify-icon-color-success: var(--toastify-color-success) !important;
+  --toastify-icon-color-warning: var(--toastify-color-warning) !important;
+  --toastify-icon-color-error: var(--toastify-color-error) !important;
+  --toastify-toast-width: 400px !important;
+  --toastify-toast-background: #fff !important;
+  --toastify-toast-min-height: 64px !important;
+  --toastify-toast-max-height: 800px !important;
+  --toastify-font-family: Segoe UI !important;
+  --toastify-z-index: 9999 !important;
+  --toastify-text-color-light: #757575 !important;
+  --toastify-text-color-dark: #fff !important;
+  --toastify-spinner-color: #616161 !important;
+  --toastify-spinner-color-empty-area: #e0e0e0 !important;
+}
+
 /*
 ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
 */
@@ -3220,6 +3244,16 @@ video {
 
 .dark,[data-theme="dark"] {
   color-scheme: dark;
+  --nextui-background-50: 227 50% 5%;
+  --nextui-background-100: 220 32% 15%;
+  --nextui-background-200: 223 28% 25%;
+  --nextui-background-300: 224 28% 35%;
+  --nextui-background-400: 226 27% 45%;
+  --nextui-background-500: 229 27% 55%;
+  --nextui-background-600: 229 27% 65%;
+  --nextui-background-700: 230 28% 75%;
+  --nextui-background-800: 235 32% 85%;
+  --nextui-background-900: 233 74% 95%;
   --nextui-background: 220 31% 11%;
   --nextui-foreground-50: 240 6% 10%;
   --nextui-foreground-100: 240 4% 16%;
