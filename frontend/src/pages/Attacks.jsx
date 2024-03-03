@@ -16,7 +16,11 @@ export default function Attacks() {
     const [startingAttacks, setStartingAttacks] = useState([]);
     const [stoppingAttacks, setStoppingAttacks] = useState([]);
     const [restartingAttacks, setRestartingAttacks] = useState([]);
+    const [attackLogsID, setAttackLogsID] = useState();
+    const [attackLogs, setAttackLogs] = useState();
+    const [logInterval, setLogInterval] = useState(null);
     const {isOpen: isOpenAddScript, onOpen: onOpenAddScript, onOpenChange: onOpenChangeAddScript, onClose: onCloseAddScript} = useDisclosure();
+    const {isOpen: isOpenLogs, onOpen: onOpenLogs, onOpenChange: onOpenChangeLogs, onClose: onCloseLogs} = useDisclosure();
 
     useEffect(() => {
         if (scriptsData.length > 0 && attackStatusData.length > 0) {
@@ -153,6 +157,28 @@ export default function Attacks() {
         }
     };
 
+    const handleViewLogs = async (id) => {
+        setAttackLogsID(id);
+        fetchAttackLogs(id);
+        onOpenLogs();
+    };
+
+    const fetchAttackLogs = async (id) => {
+        try {
+            const response = await fetch(`${config.API_BASE_URL}/attack/logs/${id}`);
+            const responseData = await response.json();
+            if (response.ok && responseData.status === 'OK'){
+                setAttackLogs(responseData.data);
+            } else {
+                toast.error(`Failed to fetch attack logs for script with ID ${id}.`)
+                onCloseLogs();
+            }
+        } catch (error) {
+            console.error('Error fetching attack logs:', error);
+            toast.error(`Failed to fetch attack logs for script with ID ${id}.`);
+        }
+    };
+
 
     if (loading) {
         return (
@@ -224,9 +250,9 @@ export default function Attacks() {
                                 </TableCell>
                                 <TableCell className='text-center'>
                                     <div className="flex justify-center items-center gap-2">
-                                        <Tooltip content="Logs">
+                                        <Tooltip content="View logs">
                                             <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                                <EyeIcon />
+                                                <EyeIcon onClick={() => handleViewLogs(scripts._id)}/>
                                             </span>
                                             </Tooltip>
                                             <Tooltip content="Edit script">
@@ -272,6 +298,18 @@ export default function Attacks() {
                         </ModalContent>
                     </Modal>
                 </div>
+                <Modal isOpen={isOpenLogs} onOpenChange={onOpenChangeLogs} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton size='5xl' scrollBehavior="inside">
+                    <ModalContent>
+                    {(onCloseLogs) => (
+                        <>
+                            <ModalHeader>Logs for attack script with ID {attackLogsID}</ModalHeader>
+                            <ModalBody>
+                                <pre className="text-sm font-mono">{attackLogs}</pre>
+                            </ModalBody>
+                        </>
+                    )}
+                    </ModalContent>
+                </Modal>
         </>
     )
 }
