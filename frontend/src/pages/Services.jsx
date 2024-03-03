@@ -129,18 +129,23 @@ export default function Services() {
 
     if (loading) {
         return (
-            <div className='flex justify-center mt-10'>
-                <Table removeWrapper className="w-1/2">
-                    <TableHeader>
-                        <TableColumn>NAME</TableColumn>
-                        <TableColumn>ID</TableColumn>
-                        <TableColumn>SCRIPTS</TableColumn>
-                        <TableColumn>PORT</TableColumn>
-                        <TableColumn>ACTION</TableColumn>
-                    </TableHeader>
-                    <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
-                </Table>
-            </div>
+            <>
+                <div className='flex justify-center mt-10'>
+                    <Table removeWrapper className="w-1/2">
+                        <TableHeader>
+                            <TableColumn>NAME</TableColumn>
+                            <TableColumn>ID</TableColumn>
+                            <TableColumn>SCRIPTS</TableColumn>
+                            <TableColumn>PORT</TableColumn>
+                            <TableColumn>ACTION</TableColumn>
+                        </TableHeader>
+                        <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
+                    </Table>
+                </div>
+                <div className='flex justify-center mt-10'>
+                    <Button className=" w-1/2" color="primary" variant='ghost' fullWidth="true" onPress={onOpenAddService}>ADD</Button>
+                </div>
+            </>
         );
     }
 
