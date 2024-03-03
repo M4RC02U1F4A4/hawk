@@ -61,7 +61,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                 fetchStartup();
                 toast.success(responseData.message);
             } else {
-                toast.error(responseData.message || 'Failed to add service');
+                toast.error(responseData.message || 'Failed update settings.');
             }
         } catch (error) {
             console.error('Error while saving settings:', error.message);

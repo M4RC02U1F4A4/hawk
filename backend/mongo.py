@@ -83,7 +83,7 @@ def startup(flag_regex, ip_range, my_ip):
     except:
         return {'status': 'ERROR', 'message': "Error during IPs generation."}
     logging.debug("IPs added.")
-    return {'status': 'OK', 'message': f"Startup done.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
+    return {'status': 'OK', 'message': f"Startup variables updated.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
 
 def get_startup():
     try:
