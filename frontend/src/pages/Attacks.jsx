@@ -18,7 +18,6 @@ export default function Attacks() {
     const [restartingAttacks, setRestartingAttacks] = useState([]);
     const [attackLogsID, setAttackLogsID] = useState();
     const [attackLogs, setAttackLogs] = useState();
-    const [logInterval, setLogInterval] = useState(null);
     const {isOpen: isOpenAddScript, onOpen: onOpenAddScript, onOpenChange: onOpenChangeAddScript, onClose: onCloseAddScript} = useDisclosure();
     const {isOpen: isOpenLogs, onOpen: onOpenLogs, onOpenChange: onOpenChangeLogs, onClose: onCloseLogs} = useDisclosure();
 
@@ -162,6 +161,18 @@ export default function Attacks() {
         fetchAttackLogs(id);
         onOpenLogs();
     };
+
+    useEffect(() => {
+        let intervalId;
+        if (isOpenLogs) {
+            intervalId = setInterval(() => {
+                fetchAttackLogs(attackLogsID);
+            }, 10000);
+        }
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [isOpenLogs, attackLogsID]);
 
     const fetchAttackLogs = async (id) => {
         try {
