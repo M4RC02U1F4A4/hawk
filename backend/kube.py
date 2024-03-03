@@ -83,7 +83,7 @@ def create_new_attack(namespace, script_id):
     return {'status': "OK", 'message':f"Attack with script ID {script_id} started."}
 
 
-def delete_attack(namespace, script_id):
+def stop_attack(namespace, script_id):
     config.load_kube_config()
     success = True
     api_instance = client.CoreV1Api()
@@ -98,7 +98,7 @@ def delete_attack(namespace, script_id):
 
     if not success:
         return {'status': "ERROR", 'message':f"Some errors has occured during the {script_id} deletion."}
-    return {'status': "OK", 'message':f"Attack with script ID {script_id} deleted."}
+    return {'status': "OK", 'message':f"Attack with script ID {script_id} stopped."}
     
 
 def get_status(namespace, script_id):
