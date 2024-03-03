@@ -4,7 +4,6 @@ import { Modal, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip} from "@nextui-org/react";
 import {EditIcon} from "./icons/EditIcon";
 import {DeleteIcon} from "./icons/DeleteIcon";
-import {EyeIcon} from "./icons/EyeIcon";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import config from "../config";

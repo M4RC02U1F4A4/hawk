@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup
-from kube import create_new_attack, delete_attack, get_status, get_status_all, get_logs
+from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs
 from bson import Binary
 from flask_cors import CORS
 
@@ -70,9 +70,9 @@ def http_get_scripts():
 def http_attack_start(id):
     return jsonify(create_new_attack("hawk", id)), 200
 
-@app.route("/attack/delete/<id>", methods=['GET'])
-def http_attack_delete(id):
-    return jsonify(delete_attack("hawk", id)), 200
+@app.route("/attack/stop/<id>", methods=['GET'])
+def http_attack_stop(id):
+    return jsonify(stop_attack("hawk", id)), 200
 
 @app.route("/attack/status/<id>", methods=['GET'])
 def http_attack_status(id):

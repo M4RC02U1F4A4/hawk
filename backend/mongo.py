@@ -15,6 +15,7 @@ db = mongo_client.hawk
 scriptsDB = db['scripts']
 configsDB = db['configs']
 servicesDB = db['services']
+flagsDB = db['flags']
 
 # ------------------------------------------------------------------------------------------
 # Startup functions
@@ -196,6 +197,7 @@ def extract_scripts():
             script['service'] =  str(script['service'])
             script['script'] = base64.b64encode(script['script']).decode("utf-8")
             script['requirements'] = base64.b64encode(script['requirements']).decode("utf-8")
+            script['flags'] = flagsDB.count_documents({"script_id": script['_id']})
         logging.debug(f"Scripts: {scripts}")
         return {'status': 'OK', 'message': 'Scripts extracted.', 'data':scripts}
     except:
