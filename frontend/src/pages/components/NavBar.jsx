@@ -71,11 +71,11 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
 
     return (
         <>
-        <Navbar>
+        <Navbar maxWidth="full">
             <NavbarBrand>
                 <a className="font-bold text-inherit" href="/" >HAWK</a>
             </NavbarBrand>
-            <NavbarContent className="sm:flex gap-4" justify="center">
+            <NavbarContent className="sm:bassis-full gap-4" justify='center'>
                 <NavbarItem isActive={activePage === "attacks"}>
                     <Link className="cursor-pointer" color={activePage === "attacks" ? "primary" : "foreground"} onClick={() => handleNavLinkClick("attacks")}>
                         Attacks

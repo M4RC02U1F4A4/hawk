@@ -6781,10 +6781,6 @@ video {
     margin-bottom: 4rem;
   }
 
-  .sm\:flex {
-    display: flex;
-  }
-
   .sm\:items-start {
     align-items: flex-start;
   }
