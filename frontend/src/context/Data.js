@@ -7,10 +7,10 @@ const DataContext = createContext();
 export const useDataContext = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
-  const [servicesData, setServicesData] = useState({});
-  const [scriptsData, setScriptsData] = useState({});
-  const [attackStatusData, setAttackStatusData] = useState({});
-  const [startupData, setStartupData] = useState({});
+  const [servicesData, setServicesData] = useState([]);
+  const [scriptsData, setScriptsData] = useState([]);
+  const [attackStatusData, setAttackStatusData] = useState([]);
+  const [startupData, setStartupData] = useState([]);
 
   const fetchServices = async () => {
     try {
