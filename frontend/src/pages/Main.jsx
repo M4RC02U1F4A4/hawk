@@ -25,7 +25,7 @@ export const Main = () => {
             {activePage === "farm" && <Farm />}
             {activePage === "services" && <Services />}
         </div>
-        <ToastContainer closeButton={false} position="bottom-right" autoClose={2500} hideProgressBar={false} newestOnTop closeOnClick rtl={false} pauseOnFocusLoss draggable={false} pauseOnHover={false} theme="dark" transition={Zoom} />
+        <ToastContainer closeButton={false} position="bottom-right" autoClose={2500} hideProgressBar={false} newestOnTop rtl={false} pauseOnFocusLoss={false} draggable={false} pauseOnHover={true} theme="dark" transition={Zoom} />
     </div>
   );
   
