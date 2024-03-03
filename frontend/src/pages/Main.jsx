@@ -18,8 +18,8 @@ export const Main = () => {
   };
 
   return (
-    <div className='mx-8'>
-        <NavBar activePage={activePage} handleNavLinkClick={handleNavLinkClick} />
+    <div>
+        <NavBar activePage={activePage} handleNavLinkClick={handleNavLinkClick}/>
         <div>
             {activePage === "attacks" && <Attacks />}
             {activePage === "farm" && <Farm />}

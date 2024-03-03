@@ -2391,6 +2391,11 @@ video {
   padding-bottom: 1rem;
 }
 
+.px-8 {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
 .\!pb-0 {
   padding-bottom: 0px !important;
 }

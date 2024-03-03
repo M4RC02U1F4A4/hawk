@@ -71,7 +71,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
 
     return (
         <>
-        <Navbar maxWidth="full">
+        <Navbar maxWidth="full" isBordered>
             <NavbarBrand>
                 <a className="font-bold text-inherit" href="/" >HAWK</a>
             </NavbarBrand>
