@@ -13,12 +13,9 @@ export default function Services() {
 
     const { servicesData, fetchServices } = useDataContext();
     const [loading, setLoading] = useState(true);
-    const [serviceName, setServiceName] = useState('');
-    const [servicePort, setServicePort] = useState('');
     const [serviceEdit, setServiceEdit] = useState('');
     const [newServiceName, setNewServiceName]  = useState();
     const [newServicePort, setNewServicePort]  = useState();
-    const {isOpen: isOpenAddService, onOpen: onOpenAddService, onOpenChange: onOpenChangeAddService, onClose: onCloseAddService} = useDisclosure();
     const {isOpen: isOpenEditService, onOpen: onOpenEditService, onOpenChange: onOpenChangeEditService, onClose: onCloseEditService} = useDisclosure();
 
     useEffect(() => {
@@ -45,36 +42,6 @@ export default function Services() {
             }
         } catch (error) {
             console.error('Error removing service:', error);
-            toast.error('API error');
-        }
-    };
-
-    const handleAddService = async () => {
-        if (isNaN(parseInt(servicePort)) || parseInt(servicePort) < 0 || parseInt(servicePort) > 65535) {
-            toast.error('Port must be a valid number between 0 and 65535');
-            return;
-        }
-
-        try {
-            const response = await fetch(`${config.API_BASE_URL}/add/service`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ name: serviceName, port: servicePort })
-            });
-            const responseData = await response.json();
-            if (response.ok && responseData.status === 'OK') {
-                fetchServices();
-                onCloseAddService();
-                toast.success(responseData.message);
-                setServiceName('');
-                setServicePort('');
-            } else {
-                toast.error(responseData.message || 'Failed to add service');
-            }
-        } catch (error) {
-            console.error('Error adding service:', error);
             toast.error('API error');
         }
     };
@@ -115,12 +82,6 @@ export default function Services() {
         }
     }
 
-    const handleKeyPressAdd = (event) => {
-        if (event.key === 'Enter') {
-            handleAddService();
-        }
-    };
-
     const handleKeyPressEdit = (event) => {
         if (event.key === 'Enter') {
             handleUpdateService();
@@ -142,26 +103,7 @@ export default function Services() {
                         <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
                     </Table>
                 </div>
-                <div className='flex justify-center mt-10'>
-                    <Button className=" w-1/2" color="primary" variant='ghost' fullWidth="true" onPress={onOpenAddService}>ADD</Button>
-                </div>
-                <Modal isOpen={isOpenAddService} onOpenChange={onOpenChangeAddService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
-                <ModalContent>
-                {(onCloseAddService) => (
-                    <>
-                        <ModalHeader>Add Service</ModalHeader>
-                        <ModalBody>
-                            <Input label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
-                            <Input label="Port" value={servicePort} onChange={(e) => setServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onCloseAddService}> Cancel </Button>
-                            <Button color='primary' onClick={handleAddService}> Add </Button>
-                        </ModalFooter>
-                    </>
-                )}
-                </ModalContent>
-            </Modal>
+                <AddService />
             </>
         );
     }
@@ -205,6 +147,73 @@ export default function Services() {
                     </TableBody>
                 </Table>
             </div>
+            <AddService />
+            <Modal isOpen={isOpenEditService} onOpenChange={onOpenChangeEditService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
+                <ModalContent>
+                {(onCloseEditService) => (
+                    <>
+                        <ModalHeader>Edit Service {serviceEdit.id} [{serviceEdit.name}]</ModalHeader>
+                        <ModalBody>
+                            <Input label="Name" placeholder={serviceEdit.name} onChange={(e) => setNewServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
+                            <Input label="Port" placeholder={serviceEdit.port} onChange={(e) => setNewServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
+                        </ModalBody>
+                        <ModalFooter>
+                            <Button color="danger" variant="light" onPress={onCloseEditService}> Cancel </Button>
+                            <Button color='primary' onClick={handleUpdateService} > Edit </Button>
+                        </ModalFooter>
+                    </>
+                )}
+                </ModalContent>
+            </Modal>
+        </>
+    )
+}
+
+const AddService = () => {
+
+    const { servicesData, fetchServices } = useDataContext();
+    const [serviceName, setServiceName] = useState('');
+    const [servicePort, setServicePort] = useState('');
+    const {isOpen: isOpenAddService, onOpen: onOpenAddService, onOpenChange: onOpenChangeAddService, onClose: onCloseAddService} = useDisclosure();
+
+    const handleAddService = async () => {
+        if (isNaN(parseInt(servicePort)) || parseInt(servicePort) < 0 || parseInt(servicePort) > 65535) {
+            toast.error('Port must be a valid number between 0 and 65535');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${config.API_BASE_URL}/add/service`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: serviceName, port: servicePort })
+            });
+            const responseData = await response.json();
+            if (response.ok && responseData.status === 'OK') {
+                fetchServices();
+                onCloseAddService();
+                toast.success(responseData.message);
+                setServiceName('');
+                setServicePort('');
+            } else {
+                toast.error(responseData.message || 'Failed to add service');
+            }
+        } catch (error) {
+            console.error('Error adding service:', error);
+            toast.error('API error');
+        }
+    };
+
+    const handleKeyPressAdd = (event) => {
+        if (event.key === 'Enter') {
+            handleAddService();
+        }
+    };
+
+    return (
+        <>
             <div className='flex justify-center mt-10'>
                 <Button className=" w-1/2" color="primary" variant='ghost' fullWidth="true" onPress={onOpenAddService}>ADD</Button>
             </div>
@@ -220,23 +229,6 @@ export default function Services() {
                         <ModalFooter>
                             <Button color="danger" variant="light" onPress={onCloseAddService}> Cancel </Button>
                             <Button color='primary' onClick={handleAddService}> Add </Button>
-                        </ModalFooter>
-                    </>
-                )}
-                </ModalContent>
-            </Modal>
-            <Modal isOpen={isOpenEditService} onOpenChange={onOpenChangeEditService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
-                <ModalContent>
-                {(onCloseEditService) => (
-                    <>
-                        <ModalHeader>Edit Service {serviceEdit.id} [{serviceEdit.name}]</ModalHeader>
-                        <ModalBody>
-                            <Input label="Name" placeholder={serviceEdit.name} onChange={(e) => setNewServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
-                            <Input label="Port" placeholder={serviceEdit.port} onChange={(e) => setNewServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onCloseEditService}> Cancel </Button>
-                            <Button color='primary' onClick={handleUpdateService} > Edit </Button>
                         </ModalFooter>
                     </>
                 )}
