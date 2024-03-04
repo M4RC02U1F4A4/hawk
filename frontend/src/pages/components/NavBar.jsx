@@ -12,12 +12,12 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
     const { startupData, fetchStartup } = useDataContext();
     const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure();
     const [loadingStartup, setLoadingStartup] = useState(true);
-    const [flagRegex, setFlagRegex] = useState();
-    const [ipRange, setIpRange] = useState();
-    const [myIp, setMyIp] = useState();
+    const [flagRegex, setFlagRegex] = useState("");
+    const [ipRange, setIpRange] = useState("");
+    const [myIp, setMyIp] = useState("");
 
     useEffect(() => {
-        if (startupData.length > 0) {
+        if (Object.keys(startupData).length > 0) {
             setLoadingStartup(false);
             setFlagRegex(startupData.flag_regex);
             setIpRange(startupData.ip_range);
@@ -30,7 +30,6 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
         let ipRangeToSend = ipRange;
         let myIpToSend = myIp;
 
-        // Check if input fields are empty, if so, use previous values
         if (!flagRegex) {
             flagRegexToSend = startupData.flag_regex;
         }
@@ -101,11 +100,11 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                 </ModalHeader>
                 <ModalBody>
                   <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="Flag regex" placeholder={loadingStartup ? startupData.flag_regex : ""} onChange={(e) => setFlagRegex(e.target.value)} />
+                    <Input type="text" label="Flag regex" placeholder={loadingStartup ? "" : startupData.flag_regex} onChange={(e) => setFlagRegex(e.target.value)} />
                   </div>
                   <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="IP Range" placeholder={loadingStartup ? startupData.ip_range : ""} onChange={(e) => setIpRange(e.target.value)} />
-                    <Input type="text" label="Team IP" placeholder={loadingStartup ? startupData.my_ip : ""} onChange={(e) => setMyIp(e.target.value)} />
+                    <Input type="text" label="IP Range" placeholder={loadingStartup ? "" : startupData.ip_range} onChange={(e) => setIpRange(e.target.value)} />
+                    <Input type="text" label="Team IP" placeholder={loadingStartup ? "" : startupData.my_ip} onChange={(e) => setMyIp(e.target.value)} />
                   </div>
                 </ModalBody>
                 <ModalFooter>
