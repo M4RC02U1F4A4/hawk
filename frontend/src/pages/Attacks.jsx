@@ -245,7 +245,7 @@ export default function Attacks() {
 
     return (
         <>
-            <div className='flex justify-center mt-10'>
+            <div className='flex justify-center mt-10 m-1'>
                 <Table removeWrapper>
                     <TableHeader>
                     <TableColumn>NAME</TableColumn>
