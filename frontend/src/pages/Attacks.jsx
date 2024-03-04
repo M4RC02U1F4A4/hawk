@@ -223,8 +223,8 @@ export default function Attacks() {
 
     if (loading) {
         return (
-            <div className='flex justify-center mt-10'>
-                <Table removeWrapper className="w-1/2">
+            <div className='flex justify-center mt-10 m-1'>
+                <Table removeWrapper>
                     <TableHeader>
                         <TableColumn>NAME</TableColumn>
                         <TableColumn>ID</TableColumn>
