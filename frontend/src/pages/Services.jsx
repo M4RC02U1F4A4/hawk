@@ -7,6 +7,7 @@ import {DeleteIcon} from "./icons/DeleteIcon";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import config from "../config";
+import SingleFileUploader from "./components/FileUploader";
 
 
 export default function Services() {
