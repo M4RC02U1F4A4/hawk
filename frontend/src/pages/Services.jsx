@@ -19,8 +19,8 @@ export default function Services() {
     const {isOpen: isOpenEditService, onOpen: onOpenEditService, onOpenChange: onOpenChangeEditService, onClose: onCloseEditService} = useDisclosure();
 
     useEffect(() => {
-        if (servicesData.length > 0) {
-            setLoading(false);
+        if (servicesData?.length > 0) {
+          setLoading(false);
         }
     }, [servicesData]);
 
@@ -110,63 +110,103 @@ export default function Services() {
 
 
     return (
-        <>
-            <div className='flex justify-center mt-10'>
-                <Table removeWrapper className="w-1/2">
-                    <TableHeader>
-                        <TableColumn>NAME</TableColumn>
-                        <TableColumn>ID</TableColumn>
-                        <TableColumn className='text-center'>SCRIPTS</TableColumn>
-                        <TableColumn className='text-center'>PORT</TableColumn>
-                        <TableColumn className='text-center'>ACTION</TableColumn>
-                    </TableHeader>
-                    <TableBody>
-                        {servicesData.map((service, index) => (
-                            <TableRow key={index}>
-                                <TableCell className='font-bold'>{service.name}</TableCell>
-                                <TableCell className='font-mono'>{service._id}</TableCell>
-                                <TableCell className='font-mono text-center'>{service.count}</TableCell>
-                                <TableCell className='font-mono text-center'>{service.port}</TableCell>
-                                {/* <TableCell className='text-center'><Button size="sm" color="danger" variant='ghost' onClick={() => handleRemoveService(service._id)}>Remove</Button></TableCell> */}
-                            <TableCell className='text-center'>
-                                <div className="flex justify-center items-center gap-2">
-                                        <Tooltip content="Edit service">
-                                        <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                                            <EditIcon onClick={() => handleEditService(service._id, service.name, service.port)}/>
-                                        </span>
-                                        </Tooltip>
-                                        <Tooltip color="danger" content="Delete service">
-                                        <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                            <DeleteIcon onClick={() => handleRemoveService(service._id)} />
-                                        </span>
-                                    </Tooltip>
-                                </div>
-                            </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-            <AddService />
-            <Modal isOpen={isOpenEditService} onOpenChange={onOpenChangeEditService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
-                <ModalContent>
-                {(onCloseEditService) => (
-                    <>
-                        <ModalHeader>Edit Service {serviceEdit.id} [{serviceEdit.name}]</ModalHeader>
-                        <ModalBody>
-                            <Input label="Name" placeholder={serviceEdit.name} onChange={(e) => setNewServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
-                            <Input label="Port" placeholder={serviceEdit.port} onChange={(e) => setNewServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onCloseEditService}> Cancel </Button>
-                            <Button color='primary' onClick={handleUpdateService} > Edit </Button>
-                        </ModalFooter>
-                    </>
-                )}
-                </ModalContent>
-            </Modal>
-        </>
-    )
+      <>
+        <div className="flex justify-center mt-10">
+          <Table removeWrapper className="w-1/2">
+            <TableHeader>
+              <TableColumn>NAME</TableColumn>
+              <TableColumn>ID</TableColumn>
+              <TableColumn className="text-center">SCRIPTS</TableColumn>
+              <TableColumn className="text-center">PORT</TableColumn>
+              <TableColumn className="text-center">ACTION</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {servicesData.map((service, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-bold">{service.name}</TableCell>
+                  <TableCell className="font-mono">{service._id}</TableCell>
+                  <TableCell className="font-mono text-center">
+                    {service.count}
+                  </TableCell>
+                  <TableCell className="font-mono text-center">
+                    {service.port}
+                  </TableCell>
+                  {/* <TableCell className='text-center'><Button size="sm" color="danger" variant='ghost' onClick={() => handleRemoveService(service._id)}>Remove</Button></TableCell> */}
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Tooltip content="Edit service">
+                        <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
+                          <EditIcon
+                            onClick={() =>
+                              handleEditService(
+                                service._id,
+                                service.name,
+                                service.port
+                              )
+                            }
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip color="danger" content="Delete service">
+                        <span className="text-lg cursor-pointer text-danger active:opacity-50">
+                          <DeleteIcon
+                            onClick={() => handleRemoveService(service._id)}
+                          />
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <AddService />
+        <Modal
+          isOpen={isOpenEditService}
+          onOpenChange={onOpenChangeEditService}
+          className="dark text-foreground bg-background"
+          backdrop="blur"
+          hideCloseButton>
+          <ModalContent>
+            {(onCloseEditService) => (
+              <>
+                <ModalHeader>
+                  Edit Service {serviceEdit.id} [{serviceEdit.name}]
+                </ModalHeader>
+                <ModalBody>
+                  <Input
+                    label="Name"
+                    placeholder={serviceEdit.name}
+                    onChange={(e) => setNewServiceName(e.target.value)}
+                    onKeyDown={(e) => handleKeyPressEdit(e)}
+                  />
+                  <Input
+                    label="Port"
+                    placeholder={serviceEdit.port}
+                    onChange={(e) => setNewServicePort(e.target.value)}
+                    onKeyDown={(e) => handleKeyPressEdit(e)}
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="danger"
+                    variant="light"
+                    onPress={onCloseEditService}>
+                    {" "}
+                    Cancel{" "}
+                  </Button>
+                  <Button color="primary" onClick={handleUpdateService}>
+                    {" "}
+                    Edit{" "}
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </>
+    );
 }
 
 const AddService = () => {
@@ -213,27 +253,58 @@ const AddService = () => {
     };
 
     return (
-        <>
-            <div className='flex justify-center mt-10'>
-                <Button className=" w-1/2" color="primary" variant='ghost' fullWidth="true" onPress={onOpenAddService}>ADD</Button>
-            </div>
-            <Modal isOpen={isOpenAddService} onOpenChange={onOpenChangeAddService} className="dark text-foreground bg-background" backdrop="blur" hideCloseButton>
-                <ModalContent>
-                {(onCloseAddService) => (
-                    <>
-                        <ModalHeader>Add Service</ModalHeader>
-                        <ModalBody>
-                            <Input label="Service Name" value={serviceName} onChange={(e) => setServiceName(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
-                            <Input label="Port" value={servicePort} onChange={(e) => setServicePort(e.target.value)} onKeyDown={(e) => handleKeyPressAdd(e)}/>
-                        </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" variant="light" onPress={onCloseAddService}> Cancel </Button>
-                            <Button color='primary' onClick={handleAddService}> Add </Button>
-                        </ModalFooter>
-                    </>
-                )}
-                </ModalContent>
-            </Modal>
-        </>
-    )
+      <>
+        <div className="flex justify-center mt-10">
+          <Button
+            className="w-1/2 "
+            color="primary"
+            variant="ghost"
+            fullWidth="true"
+            onPress={onOpenAddService}>
+            ADD
+          </Button>
+        </div>
+        <Modal
+          isOpen={isOpenAddService}
+          onOpenChange={onOpenChangeAddService}
+          className="dark text-foreground bg-background"
+          backdrop="blur"
+          hideCloseButton>
+          <ModalContent>
+            {(onCloseAddService) => (
+              <>
+                <ModalHeader>Add Service</ModalHeader>
+                <ModalBody>
+                  <Input
+                    label="Service Name"
+                    value={serviceName}
+                    onChange={(e) => setServiceName(e.target.value)}
+                    onKeyDown={(e) => handleKeyPressAdd(e)}
+                  />
+                  <Input
+                    label="Port"
+                    value={servicePort}
+                    onChange={(e) => setServicePort(e.target.value)}
+                    onKeyDown={(e) => handleKeyPressAdd(e)}
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="danger"
+                    variant="light"
+                    onPress={onCloseAddService}>
+                    {" "}
+                    Cancel{" "}
+                  </Button>
+                  <Button color="primary" onClick={handleAddService}>
+                    {" "}
+                    Add{" "}
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </>
+    );
 }
