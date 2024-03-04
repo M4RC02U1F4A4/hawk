@@ -57,6 +57,36 @@ export default function Attacks() {
         }
     }
 
+    const handleDeleteScript = async (id) => {
+        try {
+            const statusResponse = await fetch(`${config.API_BASE_URL}/attack/status/${id}`);
+            const statusData = await statusResponse.json();
+    
+            if (statusResponse.ok && statusData.status === 'ERROR') {
+                const response = await fetch(`${config.API_BASE_URL}/delete/script`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id })
+                });
+                const responseData = await response.json();
+                if (response.ok && responseData.status === 'OK') {
+                    fetchScripts();
+                    toast.success(responseData.message);
+                } else {
+                    toast.error(responseData.message || 'Failed to remove script.');
+                }
+            } else {
+                toast.error('Stop the attack before deleting the script.');
+            }
+        } catch (error) {
+            console.error('Error removing script:', error);
+            toast.error('API error');
+        }
+    }
+    
+
     const handleAttackStart = async (id) => {
         try {
             setStartingAttacks([...startingAttacks, id]);
@@ -277,7 +307,7 @@ export default function Attacks() {
                                             </Tooltip>
                                             <Tooltip color="danger" content="Delete script">
                                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                <DeleteIcon />
+                                                <DeleteIcon onClick={() => handleDeleteScript(scripts._id)}/>
                                             </span>
                                         </Tooltip>
                                     </div>
