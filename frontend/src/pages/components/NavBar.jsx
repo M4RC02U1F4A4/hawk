@@ -17,7 +17,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
     const [myIp, setMyIp] = useState("");
 
     useEffect(() => {
-        if (Object.keys(startupData).length > 0) {
+        if (startupData && Object.keys(startupData).length > 0) {
             setLoadingStartup(false);
             setFlagRegex(startupData.flag_regex);
             setIpRange(startupData.ip_range);
