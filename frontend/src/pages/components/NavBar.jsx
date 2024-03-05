@@ -68,6 +68,12 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
         }
     };
 
+    const handleKeyPressEdit = (event) => {
+      if (event.key === 'Enter') {
+        handleSaveSettings();
+      }
+    };
+
     return (
       <>
         <Navbar maxWidth="full" isBordered>
@@ -100,11 +106,11 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                 </ModalHeader>
                 <ModalBody>
                   <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="Flag regex" placeholder={loadingStartup ? "" : startupData.flag_regex} onChange={(e) => setFlagRegex(e.target.value)} />
+                    <Input type="text" label="Flag regex" placeholder={loadingStartup ? "" : startupData.flag_regex} onChange={(e) => setFlagRegex(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
                   </div>
                   <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-                    <Input type="text" label="IP Range" placeholder={loadingStartup ? "" : startupData.ip_range} onChange={(e) => setIpRange(e.target.value)} />
-                    <Input type="text" label="Team IP" placeholder={loadingStartup ? "" : startupData.my_ip} onChange={(e) => setMyIp(e.target.value)} />
+                    <Input type="text" label="IP Range" placeholder={loadingStartup ? "" : startupData.ip_range} onChange={(e) => setIpRange(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
+                    <Input type="text" label="Team IP" placeholder={loadingStartup ? "" : startupData.my_ip} onChange={(e) => setMyIp(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
                   </div>
                 </ModalBody>
                 <ModalFooter>
