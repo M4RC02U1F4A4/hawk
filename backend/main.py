@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup
-from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script
+from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs, start_farm, stop_farm, get_farm_status, get_farm_logs
 from bson import Binary
 from flask_cors import CORS
 
@@ -86,6 +86,34 @@ def http_attack_status_all():
 @app.route("/attack/logs/<id>", methods=['GET'])
 def http_attack_logs(id):
     return jsonify(get_logs("hawk", id)), 200
+
+# ------------------------------------------------------------------------------------------
+# API block to manage the farm
+@app.route("/farm/start", methods=['GET'])
+def http_farm_start():
+    return jsonify(start_farm("hawk")), 200
+
+@app.route("/farm/stop", methods=['GET'])
+def http_farm_stop():
+    return jsonify(stop_farm("hawk")), 200
+
+@app.route("/farm/status", methods=['GET'])
+def http_farm_status_all():
+    return jsonify(get_farm_status("hawk")), 200
+
+@app.route("/farm/logs", methods=['GET'])
+def http_farm_logs():
+    return jsonify(get_farm_logs("hawk")), 200
+
+@app.route("/add/submit", methods=['POST'])
+def http_add_farm_submit_script():
+    user_script = request.files['submit_script']
+    user_requirements = request.files['submit_requirements']
+
+    user_script_binary = Binary(user_script.read())
+    user_requirements_binary = Binary(user_requirements.read())
+
+    return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
 
 # ------------------------------------------------------------------------------------------
 # Hawk startup

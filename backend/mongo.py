@@ -1,4 +1,5 @@
 import pymongo
+import pymongo.errors
 import logging
 from bson import ObjectId
 import base64
@@ -46,7 +47,11 @@ def startup(flag_regex, ip_range, my_ip):
     except:
         return {'status': 'ERROR', 'message': "Not a valid IP."}
     
-    configsDB.delete_many({})
+    configsDB.delete_one({"_id": "attack_script"})
+    configsDB.delete_one({"_id": "farm_script"})
+    configsDB.delete_one({"_id": "flag_regex"})
+    configsDB.delete_one({"_id": "ips"})
+    configsDB.delete_one({"_id": "my_ip"})
     logging.debug(f"Adding attack script...")
     with open('attack_files/attack.py', 'rb') as file:
         script_binary_data = Binary(file.read())
@@ -62,6 +67,22 @@ def startup(flag_regex, ip_range, my_ip):
     except:
         return {'status': 'ERROR', 'message': "Error inserting attack script."}
     logging.debug(f"Attack script added.")
+
+    logging.debug(f"Adding farm script...")
+    with open('farm_files/farm.py', 'rb') as file:
+        script_binary_data = Binary(file.read())
+    with open('farm_files/farm_requirements.txt', 'rb') as file:
+        requirements_binary_data = Binary(file.read())
+    entry = {
+        "_id":"farm_script",
+        "script": script_binary_data,
+        "requirements": requirements_binary_data
+        }
+    try:
+        configsDB.insert_one(entry)
+    except:
+        return {'status': 'ERROR', 'message': f"Error inserting farm script."}
+    logging.debug(f"Farm script added.")
     
     logging.debug("Adding flag regex...")
     try:
@@ -218,3 +239,35 @@ def extract_attack_script():
 def get_flag_regex():
     logging.debug("Exctracting flag regex.")
     return configsDB.find_one({"_id": "flag_regex"})
+
+
+# ------------------------------------------------------------------------------------------
+# Function to manage DB data related to farm
+def extract_farm_submit():
+    logging.debug("Extracting submit script.")
+    return configsDB.find_one({"_id":'submit_script'})
+
+def extract_farm_script():
+    logging.debug("Extracting farm script file.")
+    return configsDB.find_one({"_id": "farm_script"})
+
+def add_farm_submit_script(script, requirements):   
+    logging.debug(f"Adding farm submit script.")
+    logging.debug(script)
+    logging.debug(requirements)
+    entry = {
+        "_id": 'submit_script',
+        "script": script,
+        "requirements": requirements,
+    }
+    try:
+        configsDB.insert_one(entry)
+        logging.debug(f"Farm submit script added.")
+        return {'status': 'OK', 'message': 'Farm submit script added.'}
+    except pymongo.errors.DuplicateKeyError:
+        flagsDB.update_one({'_id': 'farm_script'}, {'$set':{"script": script, "requirements": requirements}})
+        logging.debug(f"Farm submit script updated.")
+        return {'status': 'OK', 'message': 'Farm submit script updated.'}
+    except:
+        logging.error(f"Error adding farm submit script.")
+        return {'status': 'ERROR', 'message': 'Error adding farm submit script.'}

@@ -1,9 +1,10 @@
-
+import { useDataContext } from '../context/Data';
 
 export default function Farm() {
+  const { farmStatusData } = useDataContext();
     return (
       <>
-        <p className="">Farm</p>
+        <p className=""></p>
       </>
     );
 }

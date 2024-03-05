@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
   const [servicesData, setServicesData] = useState([]);
   const [scriptsData, setScriptsData] = useState([]);
   const [attackStatusData, setAttackStatusData] = useState([]);
+  const [farmStatusData, setFarmStatusData] = useState([]);
   const [startupData, setStartupData] = useState({});
 
   const fetchServices = async () => {
@@ -43,6 +44,16 @@ export const DataProvider = ({ children }) => {
       toast.error('Attacks API error');
     }
   };
+  const fetchFarmStatus = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/farm/status`);
+      const farmStatusData = await response.json();
+      setFarmStatusData(farmStatusData.data);
+    } catch (error) {
+      console.error("Farm status API request error:", error);
+      toast.error('Farm API error');
+    }
+  };
   const fetchStartup = async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/startup`);
@@ -60,6 +71,7 @@ export const DataProvider = ({ children }) => {
       await fetchScripts();
       await fetchAttackStatus();
       await fetchStartup();
+      await fetchFarmStatus();
     };
     fetchData();
     const interval = setInterval(fetchData, 5000);
