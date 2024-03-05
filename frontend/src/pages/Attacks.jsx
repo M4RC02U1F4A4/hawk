@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDataContext } from '../context/Data';
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip } from "@nextui-org/react";
 import { Modal, useDisclosure, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from "@nextui-org/react";
+import { Progress } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import { toast } from 'react-toastify';
 import { EditIcon } from "./icons/EditIcon";
@@ -487,6 +488,9 @@ export default function Attacks() {
               <ModalBody>
                 <pre className="font-mono text-sm">{attackLogs}</pre>
               </ModalBody>
+              <ModalFooter className='flex justify-center'>
+                <Progress size="sm" isIndeterminate className="max-w-md" />
+              </ModalFooter>
             </>
           )}
         </ModalContent>
