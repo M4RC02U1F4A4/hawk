@@ -109,17 +109,17 @@ export default function Attacks() {
             await new Promise(resolve => setTimeout(resolve, 1000));
           }
         }
-        setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
         toast.success(responseData.message);
         fetchAttackStatus();
       } else {
         toast.error(responseData.message || 'Failed to start attack.');
-        setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
       }
     } catch (error) {
       console.error('Error starting attack:', error);
       toast.error('API error');
-      setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
+      
+    } finally {
+setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
     }
   };
 
@@ -248,7 +248,7 @@ export default function Attacks() {
   if (loading) {
     return (
       <>
-      <div className="flex justify-center m-1 mt-10">
+      <div className="flex justify-center m-1 mt-10 px-10">
         <Table removeWrapper aria-label='Services-table'>
           <TableHeader>
             <TableColumn>NAME</TableColumn>
@@ -271,7 +271,7 @@ export default function Attacks() {
 
   return (
     <>
-      <div className="flex justify-center m-1 mt-10">
+      <div className="flex justify-center m-1 mt-10 px-10">
         <Table removeWrapper aria-label='Attack Table'>
           <TableHeader>
             <TableColumn>NAME</TableColumn>
