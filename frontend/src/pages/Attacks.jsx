@@ -114,6 +114,7 @@ export default function Attacks() {
         fetchAttackStatus();
       } else {
         toast.error(responseData.message || 'Failed to start attack.');
+        setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
       }
     } catch (error) {
       console.error('Error starting attack:', error);
