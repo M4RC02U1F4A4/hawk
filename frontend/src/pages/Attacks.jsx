@@ -453,8 +453,8 @@ export default function Attacks() {
                       </SelectItem>
                     ))}
                   </Select>
-                  <SingleFileUploader title={"Attack Script"} />
-                  <SingleFileUploader title={"Attack Requirements"} />
+                  <SingleFileUploader title={"Attack Script"} onFileChange={(item) => { console.log("Attack FILE: ", item); }} />
+                  <SingleFileUploader title={"Requirements"} onFileChange={(item)=>{console.log("Requirements FILE: ",item);}} />
                 </ModalBody>
                 <ModalFooter>
                   <Button

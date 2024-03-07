@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 
-const SingleFileUploader = ({ title }) => {
-  const [file, setFile] = useState();
+const SingleFileUploader = ({ title, onFileChange}) => {
 
   const handleFileChange = (e) => {
     if (e.target.files) {
-      setFile(e.target.files[0]);
+       if (e.target.files) {
+      const uploadedFile = e.target.files[0];
+      // Pass the file state to the parent component
+      onFileChange(uploadedFile);
     }
-  };
-
-  const handleUpload = async (e) => {
-    console.log(e)
+    }
   };
 
   return (
