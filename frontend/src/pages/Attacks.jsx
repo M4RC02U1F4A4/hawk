@@ -392,7 +392,7 @@ setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId 
           </TableBody>
         </Table>
       </div>
-                    <AddScript />
+      <AddScript />
       <Modal
         isOpen={isOpenLogs}
         onOpenChange={onOpenChangeLogs}
@@ -404,14 +404,14 @@ setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId 
         <ModalContent>
           {(onCloseLogs) => (
             <>
-              <ModalHeader>
+              <ModalHeader aria-label='logs'>
                 Logs for attack script with ID {attackLogsID}
               </ModalHeader>
               <ModalBody>
-                <pre className="font-mono text-sm">{attackLogs}</pre>
+                <pre aria-label='logs' className="font-mono text-sm">{attackLogs}</pre>
               </ModalBody>
               <ModalFooter className='flex justify-center'>
-                <Progress size="sm" isIndeterminate className="max-w-md" />
+                <Progress aria-label='progress-bar'  size="sm" isIndeterminate className="max-w-md" />
               </ModalFooter>
             </>
           )}
