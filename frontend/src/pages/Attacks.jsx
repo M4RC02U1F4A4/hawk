@@ -261,7 +261,7 @@ export default function Attacks() {
       formData.append('service', service);
       formData.append('name', name);
       formData.append('username', username);
-
+      console.log(service);
       const response = await fetch(`${config.API_BASE_URL}/add/script`, {
         method: 'POST',
         body: formData,
@@ -271,6 +271,8 @@ export default function Attacks() {
 
       if (response.ok && responseData.status === 'OK') {
         toast.success(responseData.message);
+        onCloseAddScript()
+        fetchScripts()
       } else {
         toast.error(responseData.message || 'Failed to add script.');
       }
@@ -444,17 +446,17 @@ export default function Attacks() {
               <>
                 <ModalHeader>Add Attack</ModalHeader>
                 <ModalBody>
-                  <Input label="Attack Name" className="w-full" />
-                  <Input label="Username" className="w-full" />
-                  <Select label="Service" className="w-full">
+                  <Input label="Attack Name" className="w-full" onChange={(e)=> {setName(e.target.value)} } />
+                  <Input label="Username" className="w-full" onChange={(e)=> {setUsername(e.target.value)} }/>
+                  <Select label="Service" className="w-full" onChange={(e)=> {setService(e.target.value)}}>
                     {servicesData.map((service) => (
-                      <SelectItem key={service.name} value={service.name}>
+                      <SelectItem key={service._id} value={service._id}>
                         {service.name}
                       </SelectItem>
                     ))}
                   </Select>
-                  <SingleFileUploader title={"Attack Script"} onFileChange={(item) => { console.log("Attack FILE: ", item); }} />
-                  <SingleFileUploader title={"Requirements"} onFileChange={(item)=>{console.log("Requirements FILE: ",item);}} />
+                  <SingleFileUploader title={"Attack Script"} onFileChange={(item) => { console.log("Attack FILE: ", item); setScriptFile(item)}} />
+                  <SingleFileUploader title={"Requirements"} onFileChange={(item) => { console.log("Requirements FILE: ", item); setRequirementsFile(item);}} />
                 </ModalBody>
                 <ModalFooter>
                   <Button
