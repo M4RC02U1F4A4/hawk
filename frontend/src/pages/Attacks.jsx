@@ -19,15 +19,10 @@ export default function Attacks() {
   const [restartingAttacks, setRestartingAttacks] = useState([]);
   const [attackLogsID, setAttackLogsID] = useState();
   const [attackLogs, setAttackLogs] = useState();
-  const { isOpen: isOpenAddScript, onOpen: onOpenAddScript, onOpenChange: onOpenChangeAddScript, onClose: onCloseAddScript } = useDisclosure();
+  
   const { isOpen: isOpenLogs, onOpen: onOpenLogs, onOpenChange: onOpenChangeLogs, onClose: onCloseLogs } = useDisclosure();
 
-  const [scriptFile, setScriptFile] = useState();
-  const [requirementsFile, setRequirementsFile] = useState();
-  const [name, setName] = useState();
-  const [username, setUsername] = useState();
-  const [service, setService] = useState();
-
+ 
   useEffect(() => {
     if (scriptsData.length > 0 && attackStatusData.length >= 0) {
       setLoading(false);
@@ -247,43 +242,11 @@ export default function Attacks() {
     }
   };
 
-  const handleAddScript = async () => {
-    try {
-      if (!scriptFile || !requirementsFile || !service || !name || !username) {
-        toast.error('Please fill in all fields and select files.');
-        return;
-      }
-
-      const formData = new FormData();
-
-      formData.append('user_script', scriptFile);
-      formData.append('user_requirements', requirementsFile);
-      formData.append('service', service);
-      formData.append('name', name);
-      formData.append('username', username);
-      console.log(service);
-      const response = await fetch(`${config.API_BASE_URL}/add/script`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const responseData = await response.json();
-
-      if (response.ok && responseData.status === 'OK') {
-        toast.success(responseData.message);
-        onCloseAddScript()
-        fetchScripts()
-      } else {
-        toast.error(responseData.message || 'Failed to add script.');
-      }
-    } catch (error) {
-      console.error('Error adding script:', error);
-      toast.error('API error');
-    }
-  };
+  
 
   if (loading) {
     return (
+      <>
       <div className="flex justify-center m-1 mt-10">
         <Table removeWrapper aria-label='Services-table'>
           <TableHeader>
@@ -299,7 +262,9 @@ export default function Attacks() {
           </TableHeader>
           <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
         </Table>
-      </div>
+        </div>
+        <AddScript />
+        </>
     );
   }
 
@@ -426,7 +391,82 @@ export default function Attacks() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex justify-center mt-10">
+                    <AddScript />
+      <Modal
+        isOpen={isOpenLogs}
+        onOpenChange={onOpenChangeLogs}
+        className="dark text-foreground bg-background"
+        backdrop="blur"
+        hideCloseButton
+        size="5xl"
+        scrollBehavior="inside">
+        <ModalContent>
+          {(onCloseLogs) => (
+            <>
+              <ModalHeader>
+                Logs for attack script with ID {attackLogsID}
+              </ModalHeader>
+              <ModalBody>
+                <pre className="font-mono text-sm">{attackLogs}</pre>
+              </ModalBody>
+              <ModalFooter className='flex justify-center'>
+                <Progress size="sm" isIndeterminate className="max-w-md" />
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
+    
+  );
+}
+
+const AddScript = () => {
+  const { fetchScripts, servicesData } = useDataContext();
+  const { isOpen: isOpenAddScript, onOpen: onOpenAddScript, onOpenChange: onOpenChangeAddScript, onClose: onCloseAddScript } = useDisclosure();
+  const [scriptFile, setScriptFile] = useState();
+  const [requirementsFile, setRequirementsFile] = useState();
+  const [name, setName] = useState();
+  const [username, setUsername] = useState();
+  const [service, setService] = useState();
+
+
+  const handleAddScript = async () => {
+    try {
+      if (!scriptFile || !requirementsFile || !service || !name || !username) {
+        toast.error('Please fill in all fields and select files.');
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append('user_script', scriptFile);
+      formData.append('user_requirements', requirementsFile);
+      formData.append('service', service);
+      formData.append('name', name);
+      formData.append('username', username);
+      console.log(service);
+      const response = await fetch(`${config.API_BASE_URL}/add/script`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok && responseData.status === 'OK') {
+        toast.success(responseData.message);
+        onCloseAddScript()
+        fetchScripts()
+      } else {
+        toast.error(responseData.message || 'Failed to add script.');
+      }
+    } catch (error) {
+      console.error('Error adding script:', error);
+      toast.error('API error');
+    }
+  };
+
+        return <div className="flex justify-center mt-10">
         <Button
           className="w-1/2 "
           color="primary"
@@ -473,30 +513,4 @@ export default function Attacks() {
           </ModalContent>
         </Modal>
       </div>
-      <Modal
-        isOpen={isOpenLogs}
-        onOpenChange={onOpenChangeLogs}
-        className="dark text-foreground bg-background"
-        backdrop="blur"
-        hideCloseButton
-        size="5xl"
-        scrollBehavior="inside">
-        <ModalContent>
-          {(onCloseLogs) => (
-            <>
-              <ModalHeader>
-                Logs for attack script with ID {attackLogsID}
-              </ModalHeader>
-              <ModalBody>
-                <pre className="font-mono text-sm">{attackLogs}</pre>
-              </ModalBody>
-              <ModalFooter className='flex justify-center'>
-                <Progress size="sm" isIndeterminate className="max-w-md" />
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-    </>
-  );
 }
