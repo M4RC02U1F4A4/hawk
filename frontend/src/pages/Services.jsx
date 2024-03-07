@@ -93,7 +93,7 @@ export default function Services() {
         return (
             <>
                 <div className='flex justify-center mt-10'>
-                    <Table removeWrapper className="w-1/2">
+                    <Table removeWrapper className="w-1/2" aria-label='Services-table'>
                         <TableHeader>
                             <TableColumn>NAME</TableColumn>
                             <TableColumn>ID</TableColumn>
@@ -113,7 +113,7 @@ export default function Services() {
     return (
       <>
         <div className="flex justify-center mt-10">
-          <Table removeWrapper className="w-1/2">
+          <Table removeWrapper className="w-1/2" aria-label='Services-table'>
             <TableHeader>
               <TableColumn>NAME</TableColumn>
               <TableColumn>ID</TableColumn>

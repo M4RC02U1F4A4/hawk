@@ -9,8 +9,8 @@ const SingleFileUploader = ({ title }) => {
     }
   };
 
-  const handleUpload = async () => {
-    // We will fill this out later
+  const handleUpload = async (e) => {
+    console.log(e)
   };
 
   return (

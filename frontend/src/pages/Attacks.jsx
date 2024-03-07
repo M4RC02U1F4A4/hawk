@@ -283,7 +283,7 @@ export default function Attacks() {
   if (loading) {
     return (
       <div className="flex justify-center m-1 mt-10">
-        <Table removeWrapper>
+        <Table removeWrapper aria-label='Services-table'>
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ID</TableColumn>
@@ -304,7 +304,7 @@ export default function Attacks() {
   return (
     <>
       <div className="flex justify-center m-1 mt-10">
-        <Table removeWrapper>
+        <Table removeWrapper aria-label='Attack Table'>
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ID</TableColumn>
