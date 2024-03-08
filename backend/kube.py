@@ -165,9 +165,7 @@ def start_farm(namespace):
                 }
             }
         api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
-    except Exception as e:
-        logging.debug(f"{get_startup()['data']['farm_sleep']}")
-        logging.debug(e)
+    except:
         return {'status': 'ERROR', 'message': 'Error creating config map.'} 
 
     try:

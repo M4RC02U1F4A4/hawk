@@ -41,19 +41,16 @@ def http_get_services():
 # API block to manage scripts
 @app.route("/add/script", methods=['POST'])
 def http_add_script():
-    if request.is_json:
-        user_script = request.files['user_script']
-        service_id = request.form.get('service')
-        script_name = request.form.get('name')
-        user_requirements = request.files['user_requirements']
-        username = request.form.get('username')
+    user_script = request.files['user_script']
+    service_id = request.form.get('service')
+    script_name = request.form.get('name')
+    user_requirements = request.files['user_requirements']
+    username = request.form.get('username')
 
-        user_script_binary = Binary(user_script.read())
-        user_requirements_binary = Binary(user_requirements.read())
+    user_script_binary = Binary(user_script.read())
+    user_requirements_binary = Binary(user_requirements.read())
 
-        return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
-    else:
-        return jsonify({'status': 'ERROR', 'message': 'Script not valid.'}), 400
+    return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
 
 @app.route("/delete/script", methods=['DELETE'])
 def http_delete_script():
@@ -110,16 +107,14 @@ def http_farm_logs():
 
 @app.route("/add/submit", methods=['POST'])
 def http_add_farm_submit_script():
-    if request.is_json:
-        user_script = request.files['submit_script']
-        user_requirements = request.files['submit_requirements']
+    user_script = request.files['submit_script']
+    user_requirements = request.files['submit_requirements']
 
-        user_script_binary = Binary(user_script.read())
-        user_requirements_binary = Binary(user_requirements.read())
+    user_script_binary = Binary(user_script.read())
+    user_requirements_binary = Binary(user_requirements.read())
 
-        return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
-    else:
-        return jsonify({'status': 'ERROR', 'message': 'Script not valid.'}), 400
+    return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
+
 
 @app.route("/farm/flags", methods=['GET'])
 def http_farm_flags():
@@ -141,7 +136,7 @@ def http_startup():
         if request.is_json:
             data = request.get_json()
             if data['flag_regex'] and data['ip_range'] and data['my_ip'] and data['farm_sleep']:
-                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'], data['farm_sleep'])), 200
+                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'], )), 200
         return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
     elif request.method == 'GET':
         return jsonify(get_startup()), 200
