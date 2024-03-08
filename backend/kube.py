@@ -156,7 +156,7 @@ def start_farm(namespace):
                     'farm_requirements.txt': base64.b64encode(farm_script['requirements']).decode('utf-8')
                     },
                 'data': {
-                    'FARM_SLEEP': "1000",
+                    'FARM_SLEEP': "100",
                     'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
                     'PYTHONUNBUFFERED': '1'
                 }

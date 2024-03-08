@@ -271,3 +271,32 @@ def add_farm_submit_script(script, requirements):
     except:
         logging.error(f"Error adding farm submit script.")
         return {'status': 'ERROR', 'message': 'Error adding farm submit script.'}
+    
+def get_farm_flags():
+    try:
+        data = {
+            "total": flagsDB.count_documents({}),
+            "accepted": flagsDB.count_documents({"status": "ACCEPTED"}),
+            "rejected": flagsDB.count_documents({"status": "REJECTED"}),
+            "error": flagsDB.count_documents({"status": "GENERIC ERROR"})
+        }
+        return {'status': 'OK', 'message': 'Flags successfully extracted.', 'data': data}
+    except:
+        return {'status': "ERROR", 'message': 'Error during flag extraction.'}
+
+def flags_submit(flags):
+    logging.debug(flags)
+    matches = re.findall(get_flag_regex()['flag_regex'], flags)
+    logging.debug(matches)
+    for flag in matches:
+        data = {
+            "_id": f"{flag}",
+            "status": "",
+            "script_id": "MANUAL"
+        }
+        try:
+            flagsDB.insert_one(data)
+            logging.debug(data)
+        except:
+            pass
+    return {'status': 'OK', 'message': 'Flags added.'}

@@ -15,6 +15,7 @@ module.exports = {
     themes: {
       dark: {
         colors: {
+          content1: '#172735',
           primary: {
             900: '#d7faff',
             800: '#abf3ff',

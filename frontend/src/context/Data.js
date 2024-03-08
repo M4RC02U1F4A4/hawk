@@ -12,6 +12,7 @@ export const DataProvider = ({ children }) => {
   const [attackStatusData, setAttackStatusData] = useState([]);
   const [farmStatusData, setFarmStatusData] = useState([]);
   const [startupData, setStartupData] = useState({});
+  const [flagsData, setFlagsData] = useState({});
 
   const fetchServices = async () => {
     try {
@@ -64,6 +65,16 @@ export const DataProvider = ({ children }) => {
       toast.error('Startup variables API error');
     }
   };
+  const fetchFlags = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/farm/flags`);
+      const flagsData = await response.json();
+      setFlagsData(flagsData.data);
+    } catch (error) {
+      console.error("Error fetching flags:", error);
+      toast.error('Error fetching flags');
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +83,7 @@ export const DataProvider = ({ children }) => {
       await fetchAttackStatus();
       await fetchStartup();
       await fetchFarmStatus();
+      await fetchFlags();
     };
     fetchData();
     const interval = setInterval(fetchData, 5000);
@@ -88,7 +100,11 @@ export const DataProvider = ({ children }) => {
         attackStatusData,
         fetchAttackStatus,
         startupData,
-        fetchStartup
+        fetchStartup,
+        farmStatusData,
+        fetchFarmStatus,
+        flagsData,
+        fetchFlags
       }}>
       {children}
     </DataContext.Provider>

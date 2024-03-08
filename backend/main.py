@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script, get_farm_flags, flags_submit
 from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs, start_farm, stop_farm, get_farm_status, get_farm_logs
 from bson import Binary
 from flask_cors import CORS
@@ -41,16 +41,19 @@ def http_get_services():
 # API block to manage scripts
 @app.route("/add/script", methods=['POST'])
 def http_add_script():
-    user_script = request.files['user_script']
-    service_id = request.form.get('service')
-    script_name = request.form.get('name')
-    user_requirements = request.files['user_requirements']
-    username = request.form.get('username')
+    if request.is_json:
+        user_script = request.files['user_script']
+        service_id = request.form.get('service')
+        script_name = request.form.get('name')
+        user_requirements = request.files['user_requirements']
+        username = request.form.get('username')
 
-    user_script_binary = Binary(user_script.read())
-    user_requirements_binary = Binary(user_requirements.read())
+        user_script_binary = Binary(user_script.read())
+        user_requirements_binary = Binary(user_requirements.read())
 
-    return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
+        return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
+    else:
+        return jsonify({'status': 'ERROR', 'message': 'Script not valid.'}), 400
 
 @app.route("/delete/script", methods=['DELETE'])
 def http_delete_script():
@@ -107,13 +110,28 @@ def http_farm_logs():
 
 @app.route("/add/submit", methods=['POST'])
 def http_add_farm_submit_script():
-    user_script = request.files['submit_script']
-    user_requirements = request.files['submit_requirements']
+    if request.is_json:
+        user_script = request.files['submit_script']
+        user_requirements = request.files['submit_requirements']
 
-    user_script_binary = Binary(user_script.read())
-    user_requirements_binary = Binary(user_requirements.read())
+        user_script_binary = Binary(user_script.read())
+        user_requirements_binary = Binary(user_requirements.read())
 
-    return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
+        return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
+    else:
+        return jsonify({'status': 'ERROR', 'message': 'Script not valid.'}), 400
+
+@app.route("/farm/flags", methods=['GET'])
+def http_farm_flags():
+    return get_farm_flags(), 200
+
+@app.route("/submit/flags", methods=['POST'])
+def http_flags_submit():
+    if request.is_json:
+        data = request.get_json()
+        return flags_submit(data['flags']), 200
+    else:
+        return jsonify({'status': 'ERROR', 'message': 'Flags not valid.'}), 400
 
 # ------------------------------------------------------------------------------------------
 # Hawk startup
