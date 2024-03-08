@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDataContext } from '../context/Data';
-import { Card, CardHeader, CardBody, Button, Textarea, Chip } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Button, Textarea, Chip, Progress } from "@nextui-org/react";
 import config from "../config";
 import { toast } from 'react-toastify';
 import SingleFileUploader from "./components/FileUploader";
@@ -13,6 +13,8 @@ export default function Farm() {
   const [manualFlags, setManualFlags] = useState('');
   const [scriptFile, setScriptFile] = useState();
   const [requirementsFile, setRequirementsFile] = useState();
+  const [farmLogs, setFarmLogs] = useState();
+  const [fetchLogsIntervalId, setFetchLogsIntervalId] = useState(null);
 
   const handleAddSubmitScript = async () => {
     try {
@@ -129,6 +131,37 @@ export default function Farm() {
     }
   };
 
+  const fetchFarmLogs = async (id) => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/farm/logs`);
+      const responseData = await response.json();
+      if (response.ok && responseData.status === "OK") {
+        setFarmLogs(responseData.data);
+      } else {
+        toast.error(`Failed to fetch farm logs.`);
+      }
+    } catch (error) {
+      console.error("Error fetching farm logs:", error);
+      toast.error(`Failed to fetch farm logs.`);
+    }
+  };
+
+  useEffect(() => {
+    if (farmStatusData && farmStatusData["phase"] === 'Running') {
+      const intervalId = setInterval(() => {
+        fetchFarmLogs();
+      }, 2000);
+
+      setFetchLogsIntervalId(intervalId);
+    } else {
+      clearInterval(fetchLogsIntervalId);
+      setFetchLogsIntervalId(null);
+    }
+    return () => {
+      clearInterval(fetchLogsIntervalId);
+    };
+  }, [submitScriptData]);
+
   return (
     <>
       <div className='m-1 mt-10 px-10'>
@@ -180,6 +213,16 @@ export default function Farm() {
           <Button className='mt-4' fullWidth size="lg" color="primary" variant="ghost" onClick={handleSubmit}>SUBMIT</Button>
         </div>
       </div>
+      {farmStatusData && farmStatusData["phase"] === 'Running' && (
+        <div className='grid grid-cols-1 mt-10 px-10 '>
+          <div className='flex justify-center'>
+            <pre aria-label='logs' className="font-mono text-sm">{farmLogs}</pre>
+          </div>
+          <div className='flex justify-center mt-5'>
+            <Progress aria-label='progress-bar' size="sm" isIndeterminate className="max-w-md" />
+          </div>
+        </div>
+      )}
     </>
   );
 }

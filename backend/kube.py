@@ -247,7 +247,7 @@ def get_farm_logs(namespace):
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if "hawk-farm" in pod.metadata.name][0]
-        pod_logs = api_instance.read_namespaced_pod_log(name=matching_pods.metadata.name, namespace=namespace, tail_lines=500)
+        pod_logs = api_instance.read_namespaced_pod_log(name=matching_pods.metadata.name, namespace=namespace, tail_lines=15)
         return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}
     except:
         return {'status': 'ERROR', 'message': 'Error getting pod logs.'}
