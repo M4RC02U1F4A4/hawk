@@ -281,7 +281,7 @@ def add_farm_submit_script(script, requirements):
         logging.debug(f"Farm submit script added.")
         return {'status': 'OK', 'message': 'Farm submit script added.'}
     except pymongo.errors.DuplicateKeyError:
-        flagsDB.update_one({'_id': 'farm_script'}, {'$set':{"script": script, "requirements": requirements}})
+        configsDB.update_one({'_id': 'submit_script'}, {'$set':{"script": script, "requirements": requirements}})
         logging.debug(f"Farm submit script updated.")
         return {'status': 'OK', 'message': 'Farm submit script updated.'}
     except:

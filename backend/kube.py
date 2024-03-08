@@ -141,6 +141,7 @@ def get_logs_id(namespace, script_id):
 # ------------------------------------------------------------------------------------------------------
     
 def start_farm(namespace):
+    stop_farm(namespace)
     config.load_kube_config()
     try:
         submit_script = mongo.extract_farm_submit()
