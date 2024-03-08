@@ -2,8 +2,8 @@ import pymongo
 import pymongo.errors
 import logging
 from bson import ObjectId
-import base64
 from bson import Binary
+import base64
 import env
 import ipaddress
 import re

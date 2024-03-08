@@ -160,7 +160,7 @@ export default function Farm() {
     return () => {
       clearInterval(fetchLogsIntervalId);
     };
-  }, [submitScriptData]);
+  }, [farmStatusData]);
 
   return (
     <>
