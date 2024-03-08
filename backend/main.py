@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script, get_farm_flags, flags_submit
+from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script, get_farm_flags, flags_submit, farm_submit_status
 from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs, start_farm, stop_farm, get_farm_status, get_farm_logs
 from bson import Binary
 from flask_cors import CORS
@@ -115,6 +115,9 @@ def http_add_farm_submit_script():
 
     return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
 
+@app.route("/farm/submit/status", methods=['GET'])
+def http_farm_submit_status():
+    return farm_submit_status(), 200
 
 @app.route("/farm/flags", methods=['GET'])
 def http_farm_flags():

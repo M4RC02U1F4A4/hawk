@@ -316,3 +316,9 @@ def flags_submit(flags):
         except:
             pass
     return {'status': 'OK', 'message': 'Flags added.'}
+
+def farm_submit_status():
+    if extract_farm_submit():
+        return {'status': 'OK', 'message': 'Submit script configured.'}
+    else:
+        return {'status': 'ERROR', 'message': 'No submit script found.'}

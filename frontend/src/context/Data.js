@@ -13,6 +13,7 @@ export const DataProvider = ({ children }) => {
   const [farmStatusData, setFarmStatusData] = useState([]);
   const [startupData, setStartupData] = useState({});
   const [flagsData, setFlagsData] = useState({});
+  const [submitScriptData, setSubmitScriptData] = useState({});
 
   const fetchServices = async () => {
     try {
@@ -75,6 +76,16 @@ export const DataProvider = ({ children }) => {
       toast.error('Error fetching flags');
     }
   };
+  const fetchSubmitScript = async () => {
+    try {
+      const response = await fetch(`${config.API_BASE_URL}/farm/submit/status`);
+      const submitScriptData = await response.json();
+      setSubmitScriptData(submitScriptData);
+    } catch (error) {
+      console.error("Error fetching submit script:", error);
+      toast.error('Error fetching submit script');
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,6 +95,7 @@ export const DataProvider = ({ children }) => {
       await fetchStartup();
       await fetchFarmStatus();
       await fetchFlags();
+      await fetchSubmitScript();
     };
     fetchData();
     const interval = setInterval(fetchData, 5000);
@@ -104,7 +116,9 @@ export const DataProvider = ({ children }) => {
         farmStatusData,
         fetchFarmStatus,
         flagsData,
-        fetchFlags
+        fetchFlags, 
+        submitScriptData,
+        fetchSubmitScript
       }}>
       {children}
     </DataContext.Provider>

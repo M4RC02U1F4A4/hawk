@@ -1,16 +1,48 @@
 import React, { useState } from 'react';
 import { useDataContext } from '../context/Data';
-import { Card, CardHeader, CardBody, Button, Textarea } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, Button, Textarea, Chip } from "@nextui-org/react";
 import config from "../config";
 import { toast } from 'react-toastify';
-
+import SingleFileUploader from "./components/FileUploader";
 
 
 export default function Farm() {
-  const { farmStatusData, flagsData, fetchFarmStatus, fetchFlags } = useDataContext();
+  const { farmStatusData, flagsData, fetchFarmStatus, fetchFlags, submitScriptData, fetchSubmitScript } = useDataContext();
   const [startingFarm, setStartingFarm] = useState(false);
   const [stoppingFarm, setStoppingFarm] = useState(false);
   const [manualFlags, setManualFlags] = useState('');
+  const [scriptFile, setScriptFile] = useState();
+  const [requirementsFile, setRequirementsFile] = useState();
+
+  const handleAddSubmitScript = async () => {
+    try {
+      if (!scriptFile || !requirementsFile) {
+        toast.error('Please upload script and requirements files.');
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append('submit_script', scriptFile);
+      formData.append('submit_requirements', requirementsFile);
+      const response = await fetch(`${config.API_BASE_URL}/add/submit`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok && responseData.status === 'OK') {
+        toast.success(responseData.message);
+        fetchSubmitScript();
+      } else {
+        toast.error(responseData.message || 'Failed to update submit script.');
+      }
+    } catch (error) {
+      console.error('Error updating script:', error);
+      toast.error('API error');
+    }
+  };
 
   const handleFarmStart = async () => {
     try {
@@ -125,7 +157,24 @@ export default function Farm() {
         <FarmCard title="error" dataKey="error" flagsData={flagsData} />
       </div>
       <div className='grid grid-cols-2 m-1 mt-10 px-10 gap-4'>
-        <div></div>
+        <div className='grid grid-cols-2'>
+          <div>
+            <SingleFileUploader title={"Submit Script"} onFileChange={(item) => { setScriptFile(item)}} />
+            <SingleFileUploader title={"Requirements"} onFileChange={(item) => { setRequirementsFile(item);}} />
+            <Button className='mt-4' fullWidth size="lg" color="primary" variant="ghost" onClick={handleAddSubmitScript}>Update submit script</Button>
+          </div>
+          <div className='flex justify-center items-center'>
+              { submitScriptData && submitScriptData['status'] === 'OK'? (
+                <Chip size="lg" variant="solid" color="success" radius="sm" className='text-xl'>
+                  <p>SUBMIT SCRIPT OK</p>
+                </Chip>
+              ) : submitScriptData && submitScriptData['status'] === 'ERROR' ? (
+                <Chip size="lg" variant="solid" color="danger" radius="sm" className='text-xl'>
+                  <p>NO SUBMIT SCRIPT FOUND</p>
+                </Chip>
+              ) : (<></>)}
+          </div>
+        </div>
         <div>
           <Textarea label="MANUAL FLAGS SUBMISSIONS" value={manualFlags} onChange={(e) => setManualFlags(e.target.value)}/>
           <Button className='mt-4' fullWidth size="lg" color="primary" variant="ghost" onClick={handleSubmit}>SUBMIT</Button>
