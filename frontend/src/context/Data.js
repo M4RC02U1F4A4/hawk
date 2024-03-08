@@ -17,7 +17,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchServices = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/get/services`);
+      const response = await fetch(`${config.API_BASE_URL}/services/get`);
       const servicesData = await response.json();
       setServicesData(servicesData.data);
     } catch (error) {
@@ -28,7 +28,7 @@ export const DataProvider = ({ children }) => {
 
   const fetchScripts = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/get/scripts`);
+      const response = await fetch(`${config.API_BASE_URL}/scripts/get`);
       const scriptsData = await response.json();
       setScriptsData(scriptsData.data);
     } catch (error) {
@@ -68,7 +68,7 @@ export const DataProvider = ({ children }) => {
   };
   const fetchFlags = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/farm/flags`);
+      const response = await fetch(`${config.API_BASE_URL}/farm/flags/get`);
       const flagsData = await response.json();
       setFlagsData(flagsData.data);
     } catch (error) {
@@ -78,7 +78,7 @@ export const DataProvider = ({ children }) => {
   };
   const fetchSubmitScript = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/farm/submit/status`);
+      const response = await fetch(`${config.API_BASE_URL}/farm/submit/script/status`);
       const submitScriptData = await response.json();
       setSubmitScriptData(submitScriptData);
     } catch (error) {

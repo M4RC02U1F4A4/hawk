@@ -68,7 +68,7 @@ export default function Attacks() {
       const statusData = await statusResponse.json();
 
       if (statusResponse.ok && statusData.status === 'ERROR') {
-        const response = await fetch(`${config.API_BASE_URL}/delete/script`, {
+        const response = await fetch(`${config.API_BASE_URL}/script/delete`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json'
@@ -447,7 +447,7 @@ const AddScript = () => {
       formData.append('name', name);
       formData.append('username', username);
       console.log(service);
-      const response = await fetch(`${config.API_BASE_URL}/add/script`, {
+      const response = await fetch(`${config.API_BASE_URL}/script/add`, {
         method: 'POST',
         body: formData,
       });

@@ -25,7 +25,7 @@ export default function Farm() {
 
       formData.append('submit_script', scriptFile);
       formData.append('submit_requirements', requirementsFile);
-      const response = await fetch(`${config.API_BASE_URL}/add/submit`, {
+      const response = await fetch(`${config.API_BASE_URL}/farm/submit/script/add`, {
         method: 'POST',
         body: formData,
       });
@@ -109,7 +109,7 @@ export default function Farm() {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/submit/flags`, {
+      const response = await fetch(`${config.API_BASE_URL}/farm/flags/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

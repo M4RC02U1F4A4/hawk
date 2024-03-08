@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from mongo import add_new_script, add_new_service, edit_service, extract_services, delete_service, delete_script, extract_scripts, startup, get_startup, add_farm_submit_script, get_farm_flags, flags_submit, farm_submit_status
-from kube import create_new_attack, stop_attack, get_status, get_status_all, get_logs, start_farm, stop_farm, get_farm_status, get_farm_logs
+import mongo
+import kube
 from bson import Binary
 from flask_cors import CORS
 
@@ -9,38 +9,38 @@ CORS(app)
 
 # ------------------------------------------------------------------------------------------
 # API block to manage services
-@app.route("/add/service", methods=['POST'])
-def http_add_new_service():
+@app.route("/service/add", methods=['POST'])
+def http_service_add():
     if request.is_json:
         data = request.get_json()
         if data['name'] and data['port']:
-            return jsonify(add_new_service(data['name'], data['port'])), 200
+            return jsonify(mongo.add_new_service(data['name'], data['port'])), 200
     return jsonify({'status': 'ERROR', 'message': 'Service not valid.'}), 400
  
-@app.route("/delete/service", methods=['DELETE'])
-def http_delete_service():
+@app.route("/service/delete", methods=['DELETE'])
+def http_service_delete():
     if request.is_json:
         data = request.get_json()
         if data['id']:
-            return jsonify(delete_service(data['id'])), 200
+            return jsonify(mongo.delete_service(data['id'])), 200
     return jsonify({'status': 'ERROR', 'message': 'Service not valid.'}), 400
 
-@app.route("/edit/service", methods=['PUT'])
-def http_editservice():
+@app.route("/service/edit", methods=['PUT'])
+def http_service_edit():
     if request.is_json:
         data = request.get_json()
         if data['id'] and data['name'] and data['port']:
-            return jsonify(edit_service(data['id'], data['name'], data['port'])), 200
+            return jsonify(mongo.edit_service(data['id'], data['name'], data['port'])), 200
     return jsonify({'status': 'ERROR', 'message': 'Service not valid.'}), 400
     
-@app.route("/get/services", methods=['GET'])
-def http_get_services():
-    return jsonify(extract_services()), 200
+@app.route("/services/get", methods=['GET'])
+def http_services_get():
+    return jsonify(mongo.extract_services()), 200
 
 # ------------------------------------------------------------------------------------------
 # API block to manage scripts
-@app.route("/add/script", methods=['POST'])
-def http_add_script():
+@app.route("/script/add", methods=['POST'])
+def http_script_add():
     user_script = request.files['user_script']
     service_id = request.form.get('service')
     script_name = request.form.get('name')
@@ -50,84 +50,84 @@ def http_add_script():
     user_script_binary = Binary(user_script.read())
     user_requirements_binary = Binary(user_requirements.read())
 
-    return add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
+    return mongo.add_new_script(script_name, user_script_binary, user_requirements_binary, service_id, username), 200
 
-@app.route("/delete/script", methods=['DELETE'])
-def http_delete_script():
+@app.route("/script/delete", methods=['DELETE'])
+def http_script_delete():
     if request.is_json:
         data = request.get_json()
         if data['id']:
-            return jsonify(delete_script(data['id']))
+            return jsonify(mongo.delete_script(data['id']))
     return jsonify({'status': 'ERROR', 'message': 'Script not valid.'}), 200
 
-@app.route("/get/scripts", methods=['GET'])
-def http_get_scripts():
-    return jsonify(extract_scripts()), 200
+@app.route("/scripts/get", methods=['GET'])
+def http_script_get():
+    return jsonify(mongo.extract_scripts()), 200
 
 
 # ------------------------------------------------------------------------------------------
 # API block to manage the attack scripts
 @app.route("/attack/start/<id>", methods=['GET'])
-def http_attack_start(id):
-    return jsonify(create_new_attack("hawk", id)), 200
+def http_attack_start_id(id):
+    return jsonify(kube.create_new_attack("hawk", id)), 200
 
 @app.route("/attack/stop/<id>", methods=['GET'])
-def http_attack_stop(id):
-    return jsonify(stop_attack("hawk", id)), 200
+def http_attack_stop_id(id):
+    return jsonify(kube.stop_attack("hawk", id)), 200
 
 @app.route("/attack/status/<id>", methods=['GET'])
-def http_attack_status(id):
-    return jsonify(get_status("hawk", id)), 200
+def http_attack_status_id(id):
+    return jsonify(kube.get_status_id("hawk", id)), 200
 
 @app.route("/attack/status", methods=['GET'])
 def http_attack_status_all():
-    return jsonify(get_status_all("hawk")), 200
+    return jsonify(kube.get_status_all("hawk")), 200
 
 @app.route("/attack/logs/<id>", methods=['GET'])
-def http_attack_logs(id):
-    return jsonify(get_logs("hawk", id)), 200
+def http_attack_logs_id(id):
+    return jsonify(kube.get_logs_id("hawk", id)), 200
 
 # ------------------------------------------------------------------------------------------
 # API block to manage the farm
 @app.route("/farm/start", methods=['GET'])
 def http_farm_start():
-    return jsonify(start_farm("hawk")), 200
+    return jsonify(kube.start_farm("hawk")), 200
 
 @app.route("/farm/stop", methods=['GET'])
 def http_farm_stop():
-    return jsonify(stop_farm("hawk")), 200
+    return jsonify(kube.stop_farm("hawk")), 200
 
 @app.route("/farm/status", methods=['GET'])
-def http_farm_status_all():
-    return jsonify(get_farm_status("hawk")), 200
+def http_farm_status():
+    return jsonify(kube.get_farm_status("hawk")), 200
 
 @app.route("/farm/logs", methods=['GET'])
 def http_farm_logs():
-    return jsonify(get_farm_logs("hawk")), 200
+    return jsonify(kube.get_farm_logs("hawk")), 200
 
-@app.route("/add/submit", methods=['POST'])
-def http_add_farm_submit_script():
+@app.route("/farm/submit/script/add", methods=['POST'])
+def http_farm_submit_script_add():
     user_script = request.files['submit_script']
     user_requirements = request.files['submit_requirements']
 
     user_script_binary = Binary(user_script.read())
     user_requirements_binary = Binary(user_requirements.read())
 
-    return add_farm_submit_script(user_script_binary, user_requirements_binary), 200
+    return mongo.add_farm_submit_script(user_script_binary, user_requirements_binary), 200
 
-@app.route("/farm/submit/status", methods=['GET'])
-def http_farm_submit_status():
-    return farm_submit_status(), 200
+@app.route("/farm/submit/script/status", methods=['GET'])
+def http_farm_submit_script_status():
+    return mongo.farm_submit_script_status(), 200
 
-@app.route("/farm/flags", methods=['GET'])
-def http_farm_flags():
-    return get_farm_flags(), 200
+@app.route("/farm/flags/get", methods=['GET'])
+def http_farm_flags_get():
+    return mongo.get_farm_flags(), 200
 
-@app.route("/submit/flags", methods=['POST'])
-def http_flags_submit():
+@app.route("/farm/flags/submit", methods=['POST'])
+def http_flags_flags_submit():
     if request.is_json:
         data = request.get_json()
-        return flags_submit(data['flags']), 200
+        return mongo.flags_submit(data['flags']), 200
     else:
         return jsonify({'status': 'ERROR', 'message': 'Flags not valid.'}), 400
 
@@ -139,10 +139,10 @@ def http_startup():
         if request.is_json:
             data = request.get_json()
             if data['flag_regex'] and data['ip_range'] and data['my_ip'] and data['farm_sleep']:
-                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'], )), 200
+                return jsonify(mongo.startup(data['flag_regex'], data['ip_range'], data['my_ip'], data['farm_sleep'])), 200
         return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
     elif request.method == 'GET':
-        return jsonify(get_startup()), 200
+        return jsonify(mongo.get_startup()), 200
 
 
 if __name__ == "__main__":

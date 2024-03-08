@@ -317,7 +317,7 @@ def flags_submit(flags):
             pass
     return {'status': 'OK', 'message': 'Flags added.'}
 
-def farm_submit_status():
+def farm_submit_script_status():
     if extract_farm_submit():
         return {'status': 'OK', 'message': 'Submit script configured.'}
     else:

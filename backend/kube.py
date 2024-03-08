@@ -1,5 +1,5 @@
 from kubernetes import client, config
-from mongo import extract_script_files, extract_attack_script, get_flag_regex, extract_farm_submit, extract_farm_script, get_startup
+import mongo
 import base64
 from datetime import datetime, timezone
 import env
@@ -10,10 +10,10 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
     try:
-        files = extract_script_files(script_id)
+        files = mongo.extract_script_files(script_id)
         if not files:
             return {'status': 'ERROR', 'message':'Script with ID {script_id} not found.'}
-        attack_script = extract_attack_script()
+        attack_script = mongo.extract_attack_script()
         api_instance = client.CoreV1Api()
         config_map = {
                 'apiVersion': 'v1',
@@ -26,7 +26,7 @@ def create_new_attack(namespace, script_id):
                     'attack_requirements.txt': base64.b64encode(attack_script['requirements']).decode('utf-8')
                     },
                 'data': {
-                    'ATTACK_FLAG_REGEX': get_flag_regex()['flag_regex'],
+                    'ATTACK_FLAG_REGEX': mongo.get_flag_regex()['flag_regex'],
                     'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
                     'ATTACK_SCRIPT_PATH': f'/app/{script_id}.py',
                     'ATTACK_SCRIPT_ID': f'{script_id}',
@@ -102,7 +102,7 @@ def stop_attack(namespace, script_id):
     return {'status': "OK", 'message':f"Attack with script ID {script_id} stopped."}
     
 
-def get_status(namespace, script_id):
+def get_status_id(namespace, script_id):
     config.load_kube_config()
     api_instance = client.CoreV1Api()
     try:
@@ -124,7 +124,7 @@ def get_status_all(namespace):
     except:
         return {'status': 'ERROR', 'message': 'Error getting pod status.'}
 
-def get_logs(namespace, script_id):
+def get_logs_id(namespace, script_id):
     config.load_kube_config()
     api_instance = client.CoreV1Api()
     try:
@@ -143,10 +143,10 @@ def get_logs(namespace, script_id):
 def start_farm(namespace):
     config.load_kube_config()
     try:
-        submit_script = extract_farm_submit()
+        submit_script = mongo.extract_farm_submit()
         if not submit_script:
             return {'status': 'ERROR', 'message':'Submit script not found.'}
-        farm_script = extract_farm_script()
+        farm_script = mongo.extract_farm_script()
         api_instance = client.CoreV1Api()
         config_map = {
                 'apiVersion': 'v1',
@@ -159,7 +159,7 @@ def start_farm(namespace):
                     'farm_requirements.txt': base64.b64encode(farm_script['requirements']).decode('utf-8')
                     },
                 'data': {
-                    'FARM_SLEEP': f"{get_startup()['data']['farm_sleep']}",
+                    'FARM_SLEEP': f"{mongo.get_startup()['data']['farm_sleep']}",
                     'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
                     'PYTHONUNBUFFERED': '1'
                 }

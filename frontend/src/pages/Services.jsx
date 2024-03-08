@@ -27,7 +27,7 @@ export default function Services() {
 
     const handleRemoveService = async (id) => {
         try {
-            const response = await fetch(`${config.API_BASE_URL}/delete/service`, {
+            const response = await fetch(`${config.API_BASE_URL}/service/delete`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,7 +62,7 @@ export default function Services() {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/edit/service`, {
+            const response = await fetch(`${config.API_BASE_URL}/service/edit`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -224,7 +224,7 @@ const AddService = () => {
         }
 
         try {
-            const response = await fetch(`${config.API_BASE_URL}/add/service`, {
+            const response = await fetch(`${config.API_BASE_URL}/service/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
