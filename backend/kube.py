@@ -27,7 +27,7 @@ def create_new_attack(namespace, script_id):
                     },
                 'data': {
                     'ATTACK_FLAG_REGEX': mongo.get_flag_regex()['flag_regex'],
-                    'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
+                    'ATTACK_MONGODB_CONNECTION_STRING': env.MONGODB_CONNECTION_STRING,
                     'ATTACK_SCRIPT_PATH': f'/app/{script_id}.py',
                     'ATTACK_SCRIPT_ID': f'{script_id}',
                     'PYTHONUNBUFFERED': '1'
@@ -160,7 +160,7 @@ def start_farm(namespace):
                     },
                 'data': {
                     'FARM_SLEEP': f"{mongo.get_startup()['data']['farm_sleep']}",
-                    'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
+                    'ATTACK_MONGODB_CONNECTION_STRING': env.MONGODB_CONNECTION_STRING,
                     'PYTHONUNBUFFERED': '1'
                 }
             }
