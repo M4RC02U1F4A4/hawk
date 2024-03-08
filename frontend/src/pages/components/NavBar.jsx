@@ -15,6 +15,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
     const [flagRegex, setFlagRegex] = useState("");
     const [ipRange, setIpRange] = useState("");
     const [myIp, setMyIp] = useState("");
+    const [farmSleep, setFarmSleep] = useState("");
 
     useEffect(() => {
         if (startupData && Object.keys(startupData).length > 0) {
@@ -22,6 +23,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
             setFlagRegex(startupData.flag_regex);
             setIpRange(startupData.ip_range);
             setMyIp(startupData.my_ip);
+            setFarmSleep(startupData.farm_sleep);
         }
     }, [startupData]);
 
@@ -29,6 +31,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
         let flagRegexToSend = flagRegex;
         let ipRangeToSend = ipRange;
         let myIpToSend = myIp;
+        let farmSleepToSend = farmSleep;
 
         if (!flagRegex) {
             flagRegexToSend = startupData.flag_regex;
@@ -39,11 +42,15 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
         if (!myIp) {
             myIpToSend = startupData.my_ip;
         }
+        if (!farmSleep) {
+          farmSleepToSend = startupData.farm_sleep;
+      }
         
         const payload = {
             flag_regex: flagRegexToSend,
             ip_range: ipRangeToSend,
-            my_ip: myIpToSend
+            my_ip: myIpToSend,
+            farm_sleep: farmSleepToSend
         };
 
         try {
@@ -111,6 +118,9 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                   <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
                     <Input type="text" label="IP Range" placeholder={loadingStartup ? "" : startupData.ip_range} onChange={(e) => setIpRange(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
                     <Input type="text" label="Team IP" placeholder={loadingStartup ? "" : startupData.my_ip} onChange={(e) => setMyIp(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
+                  </div>
+                  <div>
+                  <Input type="text" label="Farm sleep" placeholder={loadingStartup ? "" : startupData.farm_sleep} onChange={(e) => setFarmSleep(e.target.value)} onKeyDown={(e) => handleKeyPressEdit(e)}/>
                   </div>
                 </ModalBody>
                 <ModalFooter>

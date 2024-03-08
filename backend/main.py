@@ -140,8 +140,8 @@ def http_startup():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            if data['flag_regex'] and data['ip_range'] and data['my_ip']:
-                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'])), 200
+            if data['flag_regex'] and data['ip_range'] and data['my_ip'] and data['farm_sleep']:
+                return jsonify(startup(data['flag_regex'], data['ip_range'], data['my_ip'], data['farm_sleep'])), 200
         return jsonify({'status': 'ERROR', 'message': 'Startup failed.'}), 400
     elif request.method == 'GET':
         return jsonify(get_startup()), 200

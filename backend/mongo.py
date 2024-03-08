@@ -8,7 +8,7 @@ import env
 import ipaddress
 import re
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.INFO)
 
 mongo_client = pymongo.MongoClient(f"{env.MONGODB_CONNECTION_STRING}")
 db = mongo_client.hawk
@@ -21,10 +21,11 @@ flagsDB = db['flags']
 # ------------------------------------------------------------------------------------------
 # Startup functions
 # From here, the script used by the pods is loaded into the DB, the regex to match the flags is added, and the list of IPs to be attacked is generated
-def startup(flag_regex, ip_range, my_ip):
+def startup(flag_regex, ip_range, my_ip, farm_sleep):
     logging.debug(flag_regex)
     logging.debug(ip_range)
     logging.debug(my_ip)
+    logging.debug(farm_sleep)
 
     try:
         re.compile(flag_regex)
@@ -52,6 +53,19 @@ def startup(flag_regex, ip_range, my_ip):
     configsDB.delete_one({"_id": "flag_regex"})
     configsDB.delete_one({"_id": "ips"})
     configsDB.delete_one({"_id": "my_ip"})
+    configsDB.delete_one({"_id": "farm_sleep"})
+
+    logging.debug("Inserting farm sleep")
+    try:
+        entry= {
+            "_id": "farm_sleep",
+            "sleep": int(farm_sleep)
+        }
+        configsDB.insert_one(entry)
+    except:
+        return {'status': 'ERROR', 'message': 'Farm sleep time must be and integer.'}
+    logging.debug("Farm sleep added")
+    
     logging.debug(f"Adding attack script...")
     with open('attack_files/attack.py', 'rb') as file:
         script_binary_data = Binary(file.read())
@@ -105,7 +119,7 @@ def startup(flag_regex, ip_range, my_ip):
     except:
         return {'status': 'ERROR', 'message': "Error during IPs generation."}
     logging.debug("IPs added.")
-    return {'status': 'OK', 'message': f"Startup variables updated.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip}}
+    return {'status': 'OK', 'message': f"Startup variables updated.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip, "farm_sleep": farm_sleep}}
 
 def get_startup():
     try:
@@ -115,7 +129,9 @@ def get_startup():
         logging.debug(ip_range)
         my_ip = configsDB.find_one({"_id":"my_ip"})['ip']
         logging.debug(my_ip)
-        return {'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": f"{ip_range[0]}-{ip_range[-1]}", "my_ip": my_ip}}
+        farm_sleep = configsDB.find_one({"_id":"farm_sleep"})['sleep']
+        logging.debug(farm_sleep)
+        return {'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": f"{ip_range[0]}-{ip_range[-1]}", "my_ip": my_ip, "farm_sleep": farm_sleep}}
     except:
         return {'status': 'ERROR', 'message': "Error getting startup variables."}
 

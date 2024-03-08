@@ -1,8 +1,11 @@
 from kubernetes import client, config
-from mongo import extract_script_files, extract_attack_script, get_flag_regex, extract_farm_submit, extract_farm_script
+from mongo import extract_script_files, extract_attack_script, get_flag_regex, extract_farm_submit, extract_farm_script, get_startup
 import base64
 from datetime import datetime, timezone
 import env
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
 def create_new_attack(namespace, script_id):
     config.load_kube_config()
@@ -156,13 +159,15 @@ def start_farm(namespace):
                     'farm_requirements.txt': base64.b64encode(farm_script['requirements']).decode('utf-8')
                     },
                 'data': {
-                    'FARM_SLEEP': "100",
+                    'FARM_SLEEP': f"{get_startup()['data']['farm_sleep']}",
                     'ATTACK_MONGODB_CONNECTION_STRING': "mongodb://hawk-db:27017",
                     'PYTHONUNBUFFERED': '1'
                 }
             }
         api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
-    except:
+    except Exception as e:
+        logging.debug(f"{get_startup()['data']['farm_sleep']}")
+        logging.debug(e)
         return {'status': 'ERROR', 'message': 'Error creating config map.'} 
 
     try:
