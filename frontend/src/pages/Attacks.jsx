@@ -12,22 +12,27 @@ import config from "../config";
 import SingleFileUploader from "./components/FileUploader";
 
 export default function Attacks() {
-  const { scriptsData, fetchScripts, attackStatusData, servicesData, fetchAttackStatus, } = useDataContext();
-  const [loading, setLoading] = useState(true);
+  const {
+    scriptsData,
+    fetchScripts,
+    attackStatusData,
+    servicesData,
+    fetchAttackStatus,
+    fetchServices,
+    activePage,
+  } = useDataContext();
   const [startingAttacks, setStartingAttacks] = useState([]);
   const [stoppingAttacks, setStoppingAttacks] = useState([]);
   const [restartingAttacks, setRestartingAttacks] = useState([]);
   const [attackLogsID, setAttackLogsID] = useState();
   const [attackLogs, setAttackLogs] = useState();
-  
-  const { isOpen: isOpenLogs, onOpen: onOpenLogs, onOpenChange: onOpenChangeLogs, onClose: onCloseLogs } = useDisclosure();
 
- 
-  useEffect(() => {
-    if (scriptsData.length > 0 && attackStatusData.length >= 0) {
-      setLoading(false);
-    }
-  }, [scriptsData, attackStatusData]);
+  const {
+    isOpen: isOpenLogs,
+    onOpen: onOpenLogs,
+    onOpenChange: onOpenChangeLogs,
+    onClose: onCloseLogs,
+  } = useDisclosure();
 
   function formatUptime(uptimeInSeconds) {
     const hours = Math.floor(uptimeInSeconds / 3600);
@@ -54,7 +59,6 @@ export default function Attacks() {
   }
 
   function getServiceName(id) {
-    ;
     for (const item of servicesData) {
       if (item._id.includes(id)) {
         return item.name;
@@ -64,62 +68,69 @@ export default function Attacks() {
 
   const handleDeleteScript = async (id) => {
     try {
-      const statusResponse = await fetch(`${config.API_BASE_URL}/attack/status/${id}`);
+      const statusResponse = await fetch(
+        `${config.API_BASE_URL}/attack/status/${id}`
+      );
       const statusData = await statusResponse.json();
 
-      if (statusResponse.ok && statusData.status === 'ERROR') {
+      if (statusResponse.ok && statusData.status === "ERROR") {
         const response = await fetch(`${config.API_BASE_URL}/script/delete`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ id })
+          body: JSON.stringify({ id }),
         });
         const responseData = await response.json();
-        if (response.ok && responseData.status === 'OK') {
+        if (response.ok && responseData.status === "OK") {
           fetchScripts();
           toast.success(responseData.message);
         } else {
-          toast.error(responseData.message || 'Failed to remove script.');
+          toast.error(responseData.message || "Failed to remove script.");
         }
       } else {
-        toast.error('Stop the attack before deleting the script.');
+        toast.error("Stop the attack before deleting the script.");
       }
     } catch (error) {
-      console.error('Error removing script:', error);
-      toast.error('API error');
+      console.error("Error removing script:", error);
+      toast.error("API error");
     }
-  }
-
+  };
 
   const handleAttackStart = async (id) => {
     try {
       setStartingAttacks([...startingAttacks, id]);
-      const response = await fetch(`${config.API_BASE_URL}/attack/start/${id}`, {
-        method: 'GET'
-      });
+      const response = await fetch(
+        `${config.API_BASE_URL}/attack/start/${id}`,
+        {
+          method: "GET",
+        }
+      );
       const responseData = await response.json();
-      if (response.ok && responseData.status === 'OK') {
+      if (response.ok && responseData.status === "OK") {
         let phase = null;
-        while (phase !== 'Running' && phase !== 'Failed') {
-          const statusResponse = await fetch(`${config.API_BASE_URL}/attack/status/${id}`);
+        while (phase !== "Running" && phase !== "Failed") {
+          const statusResponse = await fetch(
+            `${config.API_BASE_URL}/attack/status/${id}`
+          );
           const statusData = await statusResponse.json();
           phase = statusData.data.phase;
-          if (phase !== 'Running' && phase !== 'Failed') {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+          if (phase !== "Running" && phase !== "Failed") {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
           }
         }
         toast.success(responseData.message);
         fetchAttackStatus();
       } else {
-        toast.error(responseData.message || 'Failed to start attack.');
+        toast.error(responseData.message || "Failed to start attack.");
       }
     } catch (error) {
-      console.error('Error starting attack:', error);
-      toast.error('API error');
-      
+      console.error("Error starting attack:", error);
+      toast.error("API error");
     } finally {
-setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId => StartingId !== id));
+      setStartingAttacks((prevStartingAttacks) =>
+        prevStartingAttacks.filter((StartingId) => StartingId !== id)
+      );
     }
   };
 
@@ -243,13 +254,26 @@ setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId 
     }
   };
 
-  
-
-  if (loading) {
-    return (
-      <>
-      <div className="flex justify-center m-1 mt-10 px-10">
-        <Table removeWrapper aria-label='Services-table'>
+  useEffect(() => {
+    let intervalId;
+    if (activePage == "attacks") {
+      fetchServices();
+      fetchScripts();
+      fetchAttackStatus();
+      intervalId = setInterval(() => {
+        fetchServices();
+        fetchScripts();
+        fetchAttackStatus();
+      }, 5000);
+    }
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [activePage]);
+  return (
+    <>
+      <div className="flex justify-center px-10 m-1 mt-10">
+        <Table removeWrapper aria-label="Services-table">
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ID</TableColumn>
@@ -261,135 +285,115 @@ setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId 
             <TableColumn className="text-center">ATTACK</TableColumn>
             <TableColumn className="text-center">ACTIONS</TableColumn>
           </TableHeader>
-          <TableBody emptyContent={"Loading..."}>{[]}</TableBody>
-        </Table>
-        </div>
-        <AddScript />
-        </>
-    );
-  }
-
-  return (
-    <>
-      <div className="flex justify-center m-1 mt-10 px-10">
-        <Table removeWrapper aria-label='Attack Table'>
-          <TableHeader>
-            <TableColumn>NAME</TableColumn>
-            <TableColumn>ID</TableColumn>
-            <TableColumn>SERVICE NAME</TableColumn>
-            <TableColumn>SERVICE ID</TableColumn>
-            <TableColumn className="text-center">USERNAME</TableColumn>
-            <TableColumn className="text-center">FLAGS</TableColumn>
-            <TableColumn className="text-center">AGE</TableColumn>
-            <TableColumn className="text-center">STATUS</TableColumn>
-            <TableColumn className="text-center">ATTACK</TableColumn>
-            <TableColumn className="text-center">ACTIONS</TableColumn>
-          </TableHeader>
-          <TableBody>
-            {scriptsData.map((scripts, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-bold">{scripts.name}</TableCell>
-                <TableCell className="font-mono">{scripts._id}</TableCell>
-                <TableCell className="font-mono">
-                  {getServiceName(scripts.service)}
-                </TableCell>
-                <TableCell className="font-mono">{scripts.service}</TableCell>
-                <TableCell className="font-mono text-center uppercase">
-                  {scripts.username}
-                </TableCell>
-                <TableCell className="font-mono text-center">
-                  {scripts.flags}
-                </TableCell>
-                <TableCell className="font-mono text-center">
-                  {getStatusAndUptimeById(scripts._id)["uptime"]}
-                </TableCell>
-                <TableCell className="font-mono text-center">
-                  {getStatusAndUptimeById(scripts._id)["status"] ===
+          {scriptsData.length == 0 ? (
+            <TableBody emptyContent={"No Attacks"}>{[]}</TableBody>
+          ) : (
+            <TableBody>
+              {scriptsData.map((scripts, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-bold">{scripts.name}</TableCell>
+                  <TableCell className="font-mono">{scripts._id}</TableCell>
+                  <TableCell className="font-mono">
+                    {getServiceName(scripts.service)}
+                  </TableCell>
+                  <TableCell className="font-mono">{scripts.service}</TableCell>
+                  <TableCell className="font-mono text-center uppercase">
+                    {scripts.username}
+                  </TableCell>
+                  <TableCell className="font-mono text-center">
+                    {scripts.flags}
+                  </TableCell>
+                  <TableCell className="font-mono text-center">
+                    {getStatusAndUptimeById(scripts._id)["uptime"]}
+                  </TableCell>
+                  <TableCell className="font-mono text-center">
+                    {getStatusAndUptimeById(scripts._id)["status"] ===
                     "Failed" ? (
-                    <Chip size="sm" variant="dot" color="danger">
-                      {getStatusAndUptimeById(scripts._id)["status"]}
-                    </Chip>
-                  ) : getStatusAndUptimeById(scripts._id)["status"] ===
-                    "Running" ? (
-                    <Chip size="sm" variant="dot" color="success">
-                      {getStatusAndUptimeById(scripts._id)["status"]}
-                    </Chip>
-                  ) : (
-                    <Chip size="sm" variant="dot" color="primary">
-                      {getStatusAndUptimeById(scripts._id)["status"]}
-                    </Chip>
-                  )}
-                </TableCell>
-                <TableCell className="w-40 font-mono text-center">
-                  {startingAttacks.includes(scripts._id) ? (
-                    <Button fullWidth size="sm" color="primary" isLoading>
-                      STARTING
-                    </Button>
-                  ) : stoppingAttacks.includes(scripts._id) ? (
-                    <Button fullWidth size="sm" color="danger" isLoading>
-                      STOPPING
-                    </Button>
-                  ) : restartingAttacks.includes(scripts._id) ? (
-                    <Button fullWidth size="sm" color="warning" isLoading>
-                      RESTARTING
-                    </Button>
-                  ) : getStatusAndUptimeById(scripts._id)["status"] ===
-                    "Failed" ? (
-                    <Button
-                      fullWidth
-                      size="sm"
-                      color="warning"
-                      variant="ghost"
-                      onClick={() => handleAttackRestart(scripts._id)}>
-                      RESTART
-                    </Button>
-                  ) : getStatusAndUptimeById(scripts._id)["status"] ===
-                    "Running" ? (
-                    <Button
-                      fullWidth
-                      size="sm"
-                      color="danger"
-                      variant="ghost"
-                      onClick={() => handleAttackStop(scripts._id)}>
-                      STOP
-                    </Button>
-                  ) : (
-                    <Button
-                      fullWidth
-                      size="sm"
-                      color="primary"
-                      variant="ghost"
-                      onClick={() => handleAttackStart(scripts._id)}>
-                      START
-                    </Button>
-                  )}
-                </TableCell>
-                <TableCell className="text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <Tooltip content="View logs">
-                      <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
-                        <EyeIcon
-                          onClick={() => handleViewLogs(scripts._id)}
-                        />
-                      </span>
-                    </Tooltip>
-                    <Tooltip content="Edit script">
-                      <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
-                        <EditIcon />
-                      </span>
-                    </Tooltip>
-                    <Tooltip color="danger" content="Delete script">
-                      <span className="text-lg cursor-pointer text-danger active:opacity-50">
-                        <DeleteIcon
-                          onClick={() => handleDeleteScript(scripts._id)}
-                        />
-                      </span>
-                    </Tooltip>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+                      <Chip size="sm" variant="dot" color="danger">
+                        {getStatusAndUptimeById(scripts._id)["status"]}
+                      </Chip>
+                    ) : getStatusAndUptimeById(scripts._id)["status"] ===
+                      "Running" ? (
+                      <Chip size="sm" variant="dot" color="success">
+                        {getStatusAndUptimeById(scripts._id)["status"]}
+                      </Chip>
+                    ) : (
+                      <Chip size="sm" variant="dot" color="primary">
+                        {getStatusAndUptimeById(scripts._id)["status"]}
+                      </Chip>
+                    )}
+                  </TableCell>
+                  <TableCell className="w-40 font-mono text-center">
+                    {startingAttacks.includes(scripts._id) ? (
+                      <Button fullWidth size="sm" color="primary" isLoading>
+                        STARTING
+                      </Button>
+                    ) : stoppingAttacks.includes(scripts._id) ? (
+                      <Button fullWidth size="sm" color="danger" isLoading>
+                        STOPPING
+                      </Button>
+                    ) : restartingAttacks.includes(scripts._id) ? (
+                      <Button fullWidth size="sm" color="warning" isLoading>
+                        RESTARTING
+                      </Button>
+                    ) : getStatusAndUptimeById(scripts._id)["status"] ===
+                      "Failed" ? (
+                      <Button
+                        fullWidth
+                        size="sm"
+                        color="warning"
+                        variant="ghost"
+                        onClick={() => handleAttackRestart(scripts._id)}>
+                        RESTART
+                      </Button>
+                    ) : getStatusAndUptimeById(scripts._id)["status"] ===
+                      "Running" ? (
+                      <Button
+                        fullWidth
+                        size="sm"
+                        color="danger"
+                        variant="ghost"
+                        onClick={() => handleAttackStop(scripts._id)}>
+                        STOP
+                      </Button>
+                    ) : (
+                      <Button
+                        fullWidth
+                        size="sm"
+                        color="primary"
+                        variant="ghost"
+                        onClick={() => handleAttackStart(scripts._id)}>
+                        START
+                      </Button>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Tooltip content="View logs">
+                        <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
+                          <EyeIcon
+                            onClick={() => handleViewLogs(scripts._id)}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip content="Edit script">
+                        <span className="text-lg cursor-pointer text-default-400 active:opacity-50">
+                          <EditIcon />
+                        </span>
+                      </Tooltip>
+                      <Tooltip color="danger" content="Delete script">
+                        <span className="text-lg cursor-pointer text-danger active:opacity-50">
+                          <DeleteIcon
+                            onClick={() => handleDeleteScript(scripts._id)}
+                          />
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          )}
         </Table>
       </div>
       <AddScript />
@@ -404,23 +408,54 @@ setStartingAttacks(prevStartingAttacks => prevStartingAttacks.filter(StartingId 
         <ModalContent>
           {(onCloseLogs) => (
             <>
-              <ModalHeader aria-label='logs'>
+              <ModalHeader aria-label="logs">
                 Logs for attack script with ID {attackLogsID}
               </ModalHeader>
               <ModalBody>
-                <pre aria-label='logs' className="font-mono text-sm">{attackLogs}</pre>
+                <pre aria-label="logs" className="font-mono text-sm">
+                  {attackLogs}
+                </pre>
               </ModalBody>
-              <ModalFooter className='flex justify-center'>
-                <Progress aria-label='progress-bar'  size="sm" isIndeterminate className="max-w-md" />
+              <ModalFooter className="flex justify-center">
+                <Progress
+                  aria-label="progress-bar"
+                  size="sm"
+                  isIndeterminate
+                  className="max-w-md"
+                />
               </ModalFooter>
             </>
           )}
         </ModalContent>
       </Modal>
     </>
-    
   );
 }
+
+  // return (
+  //   <>
+  //     <div className="flex justify-center px-10 m-1 mt-10">
+  //       <Table removeWrapper aria-label="Attack Table">
+  //         <TableHeader>
+  //           <TableColumn>NAME</TableColumn>
+  //           <TableColumn>ID</TableColumn>
+  //           <TableColumn>SERVICE NAME</TableColumn>
+  //           <TableColumn>SERVICE ID</TableColumn>
+  //           <TableColumn className="text-center">USERNAME</TableColumn>
+  //           <TableColumn className="text-center">FLAGS</TableColumn>
+  //           <TableColumn className="text-center">AGE</TableColumn>
+  //           <TableColumn className="text-center">STATUS</TableColumn>
+  //           <TableColumn className="text-center">ATTACK</TableColumn>
+  //           <TableColumn className="text-center">ACTIONS</TableColumn>
+  //         </TableHeader>
+  
+  //       </Table>
+  //     </div>
+  //     <AddScript />
+  
+  //   </>
+  // );
+
 
 const AddScript = () => {
   const { fetchScripts, servicesData } = useDataContext();

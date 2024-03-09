@@ -3,14 +3,15 @@ import NavBar from './components/NavBar';
 import Attacks from './Attacks'
 import Farm from './Farm'
 import Services from './Services'
-import { ToastContainer, Zoom } from 'react-toastify';
+
+import { useDataContext } from "../context/Data";
+import { Spinner } from "@nextui-org/react";
 
 export const Main = () => {
-
-  const [activePage, setActivePage] = useState(localStorage.getItem('activePage') || 'attacks');
+  const { mainLoading, activePage, setActivePage } = useDataContext();
 
   useEffect(() => {
-    localStorage.setItem('activePage', activePage);
+    localStorage.setItem("activePage", activePage);
   }, [activePage]);
 
   const handleNavLinkClick = (page) => {
@@ -18,15 +19,24 @@ export const Main = () => {
   };
 
   return (
-    <div>
-        <NavBar activePage={activePage} handleNavLinkClick={handleNavLinkClick}/>
+    <>
+      {mainLoading ? (
+        <div className="flex justify-center h-screen">
+          <Spinner />
+        </div>
+      ) : (
         <div>
+          <NavBar
+            activePage={activePage}
+            handleNavLinkClick={handleNavLinkClick}
+          />
+          <div>
             {activePage === "attacks" && <Attacks />}
             {activePage === "farm" && <Farm />}
             {activePage === "services" && <Services />}
+          </div>
         </div>
-        <ToastContainer closeButton={false} position="bottom-right" autoClose={2500} hideProgressBar={false} newestOnTop rtl={false} pauseOnFocusLoss={false} draggable={false} pauseOnHover={true} theme="dark" transition={Zoom} />
-    </div>
+      )}
+    </>
   );
-  
 };

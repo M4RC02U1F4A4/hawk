@@ -7,6 +7,10 @@ const DataContext = createContext();
 export const useDataContext = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
+  // Loading useStates
+  const [mainLoading, setMainLoading] = useState(true);
+
+  // Data
   const [servicesData, setServicesData] = useState([]);
   const [scriptsData, setScriptsData] = useState([]);
   const [attackStatusData, setAttackStatusData] = useState([]);
@@ -15,6 +19,11 @@ export const DataProvider = ({ children }) => {
   const [flagsData, setFlagsData] = useState({});
   const [submitScriptData, setSubmitScriptData] = useState({});
 
+  // Page Controller
+  const [activePage, setActivePage] = useState(
+    localStorage.getItem("activePage") || "attacks"
+  );
+
   const fetchServices = async () => {
     try {
       const response = await fetch(`${config.API_BASE_URL}/services/get`);
@@ -22,7 +31,7 @@ export const DataProvider = ({ children }) => {
       setServicesData(servicesData.data);
     } catch (error) {
       console.error("Services API request error:", error);
-      toast.error('Services API error');
+      toast.error("Services API error");
     }
   };
 
@@ -33,7 +42,7 @@ export const DataProvider = ({ children }) => {
       setScriptsData(scriptsData.data);
     } catch (error) {
       console.error("Scripts API request error:", error);
-      toast.error('Scripts API error');
+      toast.error("Scripts API error");
     }
   };
   const fetchAttackStatus = async () => {
@@ -43,7 +52,7 @@ export const DataProvider = ({ children }) => {
       setAttackStatusData(attackStatusData.data);
     } catch (error) {
       console.error("Attacks status API request error:", error);
-      toast.error('Attacks API error');
+      toast.error("Attacks API error");
     }
   };
   const fetchFarmStatus = async () => {
@@ -53,7 +62,7 @@ export const DataProvider = ({ children }) => {
       setFarmStatusData(farmStatusData.data);
     } catch (error) {
       console.error("Farm status API request error:", error);
-      toast.error('Farm API error');
+      toast.error("Farm API error");
     }
   };
   const fetchStartup = async () => {
@@ -63,7 +72,7 @@ export const DataProvider = ({ children }) => {
       setStartupData(startupData.data);
     } catch (error) {
       console.error("Startup variables API request error:", error);
-      toast.error('Startup variables API error');
+      toast.error("Startup variables API error");
     }
   };
   const fetchFlags = async () => {
@@ -73,22 +82,26 @@ export const DataProvider = ({ children }) => {
       setFlagsData(flagsData.data);
     } catch (error) {
       console.error("Error fetching flags:", error);
-      toast.error('Error fetching flags');
+      toast.error("Error fetching flags");
     }
   };
   const fetchSubmitScript = async () => {
     try {
-      const response = await fetch(`${config.API_BASE_URL}/farm/submit/script/status`);
+      const response = await fetch(
+        `${config.API_BASE_URL}/farm/submit/script/status`
+      );
       const submitScriptData = await response.json();
       setSubmitScriptData(submitScriptData);
     } catch (error) {
       console.error("Error fetching submit script:", error);
-      toast.error('Error fetching submit script');
+      toast.error("Error fetching submit script");
     }
   };
 
   useEffect(() => {
     const fetchData = async () => {
+      setMainLoading(true);
+      console.log("Fetching Data ...");
       await fetchServices();
       await fetchScripts();
       await fetchAttackStatus();
@@ -96,15 +109,18 @@ export const DataProvider = ({ children }) => {
       await fetchFarmStatus();
       await fetchFlags();
       await fetchSubmitScript();
+      console.log("Fetch Done.");
+      setMainLoading(false);
     };
     fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
     <DataContext.Provider
       value={{
+        activePage,
+        setActivePage,
+        mainLoading,
         servicesData,
         fetchServices,
         scriptsData,
@@ -116,9 +132,9 @@ export const DataProvider = ({ children }) => {
         farmStatusData,
         fetchFarmStatus,
         flagsData,
-        fetchFlags, 
+        fetchFlags,
         submitScriptData,
-        fetchSubmitScript
+        fetchSubmitScript,
       }}>
       {children}
     </DataContext.Provider>
