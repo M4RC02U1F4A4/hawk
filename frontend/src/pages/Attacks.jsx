@@ -73,7 +73,7 @@ export default function Attacks() {
       );
       const statusData = await statusResponse.json();
 
-      if (statusResponse.ok && statusData.status === "ERROR") {
+      if (statusResponse && statusData.status === "ERROR") {
         const response = await fetch(`${config.API_BASE_URL}/script/delete`, {
           method: "DELETE",
           headers: {
