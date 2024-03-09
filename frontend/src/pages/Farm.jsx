@@ -261,7 +261,7 @@ export default function Farm() {
                 color="success"
                 radius="sm"
                 className="text-xl">
-                <p>SUBMIT SCRIPT OK</p>
+                <p>FARM READY TO START</p>
               </Chip>
             ) : submitScriptData && submitScriptData["status"] === "ERROR" ? (
               <Chip
