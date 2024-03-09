@@ -231,7 +231,7 @@ export default function Attacks() {
     if (isOpenLogs) {
       intervalId = setInterval(() => {
         fetchAttackLogs(attackLogsID);
-      }, 10000);
+      }, 1000);
     }
     return () => {
       clearInterval(intervalId);
