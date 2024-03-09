@@ -113,9 +113,9 @@ export default function Services() {
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ID</TableColumn>
-            <TableColumn>SCRIPTS</TableColumn>
-            <TableColumn>PORT</TableColumn>
-            <TableColumn>ACTION</TableColumn>
+            <TableColumn className='text-center'>SCRIPTS</TableColumn>
+            <TableColumn className='text-center'>PORT</TableColumn>
+            <TableColumn className='text-center'>ACTION</TableColumn>
           </TableHeader>
 
           {servicesData.length == 0 ? (
