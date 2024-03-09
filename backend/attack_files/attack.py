@@ -32,7 +32,7 @@ while True:
     for m in matches:
         data = {
             "_id": f"{m}",
-            "status": "",
+            "status": "QUEUED",
             "script_id": f"{ATTACK_SCRIPT_ID}"
         }
         try:

@@ -446,7 +446,7 @@ const AddScript = () => {
   const handleAddScript = async () => {
     try {
       if (!scriptFile || !requirementsFile || !service || !name || !username) {
-        toast.error('Please fill in all fields and select files.');
+        toast.error('Please complete all fields and upload all files.');
         return;
       }
 

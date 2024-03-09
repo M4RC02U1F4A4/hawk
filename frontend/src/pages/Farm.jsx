@@ -222,8 +222,9 @@ export default function Farm() {
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-4 gap-4 px-10 m-1 mt-10">
+      <div className="grid grid-cols-5 gap-4 px-10 m-1 mt-10">
         <FarmCard title="total" dataKey="total" flagsData={flagsData} />
+        <FarmCard title="queued" dataKey="queued" flagsData={flagsData} />
         <FarmCard title="accepted" dataKey="accepted" flagsData={flagsData} />
         <FarmCard title="rejected" dataKey="rejected" flagsData={flagsData} />
         <FarmCard title="error" dataKey="error" flagsData={flagsData} />

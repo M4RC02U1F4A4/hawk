@@ -327,7 +327,8 @@ def get_farm_flags():
             "total": flagsDB.count_documents({}),
             "accepted": flagsDB.count_documents({"status": "ACCEPTED"}),
             "rejected": flagsDB.count_documents({"status": "REJECTED"}),
-            "error": flagsDB.count_documents({"status": "GENERIC ERROR"})
+            "error": flagsDB.count_documents({"status": "GENERIC ERROR"}),
+            "queued": flagsDB.count_documents({"status": "QUEUED"}),
         }
         return jsonify({'status': 'OK', 'message': 'Flags successfully extracted.', 'data': data}), 200
     except:
@@ -340,7 +341,7 @@ def flags_submit(flags):
     for flag in matches:
         data = {
             "_id": f"{flag}",
-            "status": "",
+            "status": "QUEUED",
             "script_id": "MANUAL"
         }
         try:

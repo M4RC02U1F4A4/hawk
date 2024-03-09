@@ -14,12 +14,8 @@ db = mongo_client.hawk
 configsDB = db['configs']
 flagsDB = db['flags']
 
-# return 0 -> ACCEPTED
-# return 1 -> REJECTED
-# return 2 -> GENERIC ERROR
-
 while True:
-    oldest_flag = flagsDB.find_one({"status": ""}, sort=[("timestamp", pymongo.ASCENDING)])
+    oldest_flag = flagsDB.find_one({"status": "QUEUED"}, sort=[("timestamp", pymongo.ASCENDING)])
     if oldest_flag:
         result  = subprocess.run(['python', '/app/submit.py', oldest_flag['_id']])
         exit_code = result.returncode
@@ -31,6 +27,8 @@ while True:
             status = {'status': 'REJECTED'}
         elif exit_code == 2:
             status = {'status': 'GENERIC ERROR'}
+        elif exit_code == 3:
+            status = {'status': 'QUEUED'}
         else:
             status = {'status': 'SUBMIT ERROR'}
 
