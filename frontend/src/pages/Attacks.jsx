@@ -277,7 +277,8 @@ export default function Attacks() {
           <TableHeader>
             <TableColumn>NAME</TableColumn>
             <TableColumn>ID</TableColumn>
-            <TableColumn>SERVICE</TableColumn>
+            <TableColumn>SERVICE NAME</TableColumn>
+            <TableColumn>SERVICE ID</TableColumn>
             <TableColumn className="text-center">USERNAME</TableColumn>
             <TableColumn className="text-center">FLAGS</TableColumn>
             <TableColumn className="text-center">AGE</TableColumn>
@@ -431,31 +432,6 @@ export default function Attacks() {
     </>
   );
 }
-
-  // return (
-  //   <>
-  //     <div className="flex justify-center px-10 m-1 mt-10">
-  //       <Table removeWrapper aria-label="Attack Table">
-  //         <TableHeader>
-  //           <TableColumn>NAME</TableColumn>
-  //           <TableColumn>ID</TableColumn>
-  //           <TableColumn>SERVICE NAME</TableColumn>
-  //           <TableColumn>SERVICE ID</TableColumn>
-  //           <TableColumn className="text-center">USERNAME</TableColumn>
-  //           <TableColumn className="text-center">FLAGS</TableColumn>
-  //           <TableColumn className="text-center">AGE</TableColumn>
-  //           <TableColumn className="text-center">STATUS</TableColumn>
-  //           <TableColumn className="text-center">ATTACK</TableColumn>
-  //           <TableColumn className="text-center">ACTIONS</TableColumn>
-  //         </TableHeader>
-  
-  //       </Table>
-  //     </div>
-  //     <AddScript />
-  
-  //   </>
-  // );
-
 
 const AddScript = () => {
   const { fetchScripts, servicesData } = useDataContext();
