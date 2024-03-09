@@ -1,14 +1,19 @@
 from kubernetes import client, config
+from kubernetes.client.rest import ApiException
 import mongo
 import base64
 from datetime import datetime, timezone
 import env
 import logging
+from flask import jsonify
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
 def create_new_attack(namespace, script_id):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except:
+        return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     try:
         files = mongo.extract_script_files(script_id)
         if not files:
@@ -33,9 +38,16 @@ def create_new_attack(namespace, script_id):
                     'PYTHONUNBUFFERED': '1'
                 }
             }
-        api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+        try:
+            api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+        except:
+            try:
+                api_instance.delete_namespaced_config_map(name=f'hawk-script-{script_id}-config', namespace=namespace)
+                api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+            except:
+                return jsonify({'status': 'ERROR', 'message': f'Error updating scritp ID {script_id} config map.'}), 500
     except:
-        return {'status': 'ERROR', 'message': 'Error creating config map.'} 
+        return jsonify({'status': 'ERROR', 'message': f'Error creating scritp ID {script_id} config map.'}), 500
     
     try:
         pod = client.V1Pod(
@@ -80,8 +92,8 @@ def create_new_attack(namespace, script_id):
         api_instance.create_namespaced_pod(namespace=namespace, body=pod)
     except:
         api_instance.delete_namespaced_config_map(namespace=namespace, body=config_map)
-        return {'status': 'ERROR', 'message': 'Error creating pod.'}
-    return {'status': "OK", 'message':f"Attack with script ID {script_id} started."}
+        return jsonify({'status': 'ERROR', 'message': f'Error creating pod for scritp ID {script_id}.'}), 500
+    return jsonify({'status': "OK", 'message':f"Attack with script ID {script_id} started."}), 201
 
 
 def stop_attack(namespace, script_id):
@@ -98,8 +110,8 @@ def stop_attack(namespace, script_id):
         success = False
 
     if not success:
-        return {'status': "ERROR", 'message':f"Some errors has occured during the {script_id} deletion."}
-    return {'status': "OK", 'message':f"Attack with script ID {script_id} stopped."}
+        return jsonify({'status': "ERROR", 'message':f"Some errors has occured during the script ID {script_id} deletion."}), 500
+    return jsonify({'status': "OK", 'message':f"Attack with script ID {script_id} stopped."}), 200
     
 
 def get_status_id(namespace, script_id):
@@ -108,9 +120,9 @@ def get_status_id(namespace, script_id):
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if script_id in pod.metadata.name][0]
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}
+        return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}), 200
     except:
-        return {'status': 'ERROR', 'message': 'Error getting pod status.'}
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
     
 def get_status_all(namespace):
     config.load_kube_config()
@@ -120,9 +132,9 @@ def get_status_all(namespace):
         data = []
         for pod in pod_list.items:
             data.append({'name':pod.metadata.name, 'phase': pod.status.phase, 'uptime': (datetime.now(timezone.utc) - pod.status.start_time).total_seconds()})
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':data}
+        return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':data}), 200
     except:
-        return {'status': 'ERROR', 'message': 'Error getting pod status.'}
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
 
 def get_logs_id(namespace, script_id):
     config.load_kube_config()
@@ -131,9 +143,9 @@ def get_logs_id(namespace, script_id):
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if script_id in pod.metadata.name][0]
         pod_logs = api_instance.read_namespaced_pod_log(name=matching_pods.metadata.name, namespace=namespace, tail_lines=500)
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}
+        return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}), 200
     except:
-        return {'status': 'ERROR', 'message': 'Error getting pod logs.'}
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod logs.'}), 500
     
 
 # ------------------------------------------------------------------------------------------------------
@@ -142,7 +154,10 @@ def get_logs_id(namespace, script_id):
     
 def start_farm(namespace):
     stop_farm(namespace)
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except:
+        return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     try:
         submit_script = mongo.extract_farm_submit()
         if not submit_script:
@@ -160,14 +175,22 @@ def start_farm(namespace):
                     'farm_requirements.txt': base64.b64encode(farm_script['requirements']).decode('utf-8')
                     },
                 'data': {
-                    'FARM_SLEEP': f"{mongo.get_startup()['data']['farm_sleep']}",
+                    'FARM_SLEEP': f"{mongo.extract_farm_sleep()['sleep']}",
                     'ATTACK_MONGODB_CONNECTION_STRING': env.MONGODB_CONNECTION_STRING,
                     'PYTHONUNBUFFERED': '1'
                 }
             }
-        api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
-    except:
-        return {'status': 'ERROR', 'message': 'Error creating config map.'} 
+        try:
+            api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+        except:
+            try:
+                api_instance.delete_namespaced_config_map(name=f'hawk-farm-config', namespace=namespace)
+                api_instance.create_namespaced_config_map(namespace=namespace, body=config_map)
+            except:
+                return jsonify({'status': 'ERROR', 'message': 'Error updating farm config map.'}), 500
+    except ApiException as e:
+        print(e)
+        return jsonify({'status': 'ERROR', 'message': 'Error creating farm config map.'}), 500
 
     try:
         pod = client.V1Pod(
@@ -212,8 +235,8 @@ def start_farm(namespace):
         api_instance.create_namespaced_pod(namespace=namespace, body=pod)
     except:
         api_instance.delete_namespaced_config_map(namespace=namespace, body=config_map)
-        return {'status': 'ERROR', 'message': 'Error creating farm.'}
-    return {'status': "OK", 'message':f"Farm started."}
+        return jsonify({'status': 'ERROR', 'message': 'Error creating farm.'}), 500
+    return jsonify({'status': "OK", 'message': "Farm started."}), 200
 
 def stop_farm(namespace):
     config.load_kube_config()
@@ -229,8 +252,8 @@ def stop_farm(namespace):
         success = False
 
     if not success:
-        return {'status': "ERROR", 'message':f"Some errors has occured during the farm deletion."}
-    return {'status': "OK", 'message':f"Farm stopped."}
+        return jsonify({'status': "ERROR", 'message':f"Some errors has occured during the farm deletion."}), 500
+    return jsonify({'status': "OK", 'message':f"Farm stopped."}), 200
 
 def get_farm_status(namespace):
     config.load_kube_config()
@@ -238,9 +261,9 @@ def get_farm_status(namespace):
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if "hawk-farm" in pod.metadata.name][0]
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}
+        return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}), 200
     except:
-        return {'status': 'ERROR', 'message': 'Error getting pod status.'}
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
     
 def get_farm_logs(namespace):
     config.load_kube_config()
@@ -249,6 +272,6 @@ def get_farm_logs(namespace):
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
         matching_pods = [pod for pod in pod_list.items if "hawk-farm" in pod.metadata.name][0]
         pod_logs = api_instance.read_namespaced_pod_log(name=matching_pods.metadata.name, namespace=namespace, tail_lines=15)
-        return {'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}
+        return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':pod_logs}), 200
     except:
-        return {'status': 'ERROR', 'message': 'Error getting pod logs.'}
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod logs.'}), 500
