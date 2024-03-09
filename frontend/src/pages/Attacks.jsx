@@ -469,6 +469,11 @@ const AddScript = () => {
         toast.success(responseData.message);
         onCloseAddScript()
         fetchScripts()
+        setScriptFile();
+        setRequirementsFile();
+        setService();
+        setName();
+        setUsername();
       } else {
         toast.error(responseData.message || 'Failed to add script.');
       }
