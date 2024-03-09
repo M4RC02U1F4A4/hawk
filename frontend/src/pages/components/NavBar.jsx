@@ -187,7 +187,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                   <div>
                     <Input
                       type="text"
-                      label="Farm sleep"
+                      label="Farm sleep (ms)"
                       placeholder={loadingStartup ? "" : startupData.farm_sleep}
                       onChange={(e) => setFarmSleep(e.target.value)}
                       onKeyDown={(e) => handleKeyPressEdit(e)}
