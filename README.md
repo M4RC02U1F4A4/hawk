@@ -1,4 +1,4 @@
-# hawk
+# HAWK - Farm for attack-defense CTF competitions 
 
 ---
 
