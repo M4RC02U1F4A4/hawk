@@ -171,7 +171,7 @@ export default function NavBar({ activePage, handleNavLinkClick }) {
                   <div className="flex flex-wrap w-full gap-4 md:flex-nowrap">
                     <Input
                       type="text"
-                      label="IP Range"
+                      label="IP List (IP1, IP2, IP3, ...)"
                       placeholder={loadingStartup ? "" : startupData.ip_range}
                       onChange={(e) => setIpRange(e.target.value)}
                       onKeyDown={(e) => handleKeyPressEdit(e)}

@@ -9,7 +9,7 @@ import ipaddress
 import re
 from flask import jsonify
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
 
 mongo_client = pymongo.MongoClient(f"{env.MONGODB_CONNECTION_STRING}")
 db = mongo_client.hawk
@@ -34,18 +34,21 @@ def startup(flag_regex, ip_range, my_ip, farm_sleep):
         return jsonify({'status': 'ERROR', 'message': "Not a valid regex."}), 400
 
     try:
-        ip1, ip2 = ip_range.split('-')
-        ip1_obj = ipaddress.ip_address(ip1.strip())
-        ip2_obj = ipaddress.ip_address(ip2.strip())
-        if ip2_obj < ip1_obj:
-            return jsonify({'status': 'ERROR', 'message': "Not a valid IP range."}), 400
+        valid_ips = []
+        ips = ip_range.split(',')
+        for ip in ips:
+            ip = ip.strip()
+            if ipaddress.IPv4Address(ip):
+                logging.debug(ip)
+                valid_ips.append(ip)
+            else:
+                return jsonify({'status': 'ERROR', 'message': "Some IPs are not valid."}), 400
+        logging.debug(valid_ips)
     except:
-        return jsonify({'status': 'ERROR', 'message': "Not a valid IP range."}), 400
+        return jsonify({'status': 'ERROR', 'message': "Found an invalid IP in the IP list."}), 400
     
     try:
-        team_ip = ipaddress.ip_address(my_ip)
-        if not ip1_obj < team_ip < ip2_obj:
-            return jsonify({'status': 'ERROR', 'message': "Team IP outside of the specified IP range."}), 400
+        ipaddress.IPv4Address(my_ip)
     except:
         return jsonify({'status': 'ERROR', 'message': "Not a valid team IP."}), 400
     
@@ -112,21 +115,18 @@ def startup(flag_regex, ip_range, my_ip, farm_sleep):
         return jsonify({'status': 'ERROR', 'message': "Error saving regex."}), 500
     logging.debug("Flag regex added.")
     
-    ips = []
     logging.debug("Adding IPs...")
     try:
-        start_ip = ipaddress.IPv4Address(ip_range.split('-')[0])
-        end_ip = ipaddress.IPv4Address(ip_range.split('-')[1])
-        for ip_int in range(int(start_ip), int(end_ip) + 1):
-            ip = ipaddress.IPv4Address(ip_int)
-            if str(ip) not in my_ip:
-                ips.append(str(ip))
-        configsDB.insert_one({"_id":"ips", "list":ips})
+        try:
+            valid_ips.remove(my_ip)
+        except:
+            pass
+        configsDB.insert_one({"_id":"ips", "list":valid_ips})
         configsDB.insert_one({"_id":"my_ip", "ip":my_ip})
     except:
-        return jsonify({'status': 'ERROR', 'message': "Error during IPs generation."}), 500
+        return jsonify({'status': 'ERROR', 'message': "Error during IPs save."}), 500
     logging.debug("IPs added.")
-    return jsonify({'status': 'OK', 'message': f"Startup variables updated.", "data":{"flag_regex": flag_regex, "ip_range": ips, "my_ip": my_ip, "farm_sleep": farm_sleep}}), 200
+    return jsonify({'status': 'OK', 'message': f"Startup variables updated.", "data":{"flag_regex": flag_regex, "ip_range": valid_ips, "my_ip": my_ip, "farm_sleep": farm_sleep}}), 200
 
 def get_startup():
     try:
@@ -138,7 +138,7 @@ def get_startup():
         logging.debug(my_ip)
         farm_sleep = configsDB.find_one({"_id":"farm_sleep"})['sleep']
         logging.debug(farm_sleep)
-        return jsonify({'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": f"{ip_range[0]}-{ip_range[-1]}", "my_ip": my_ip, "farm_sleep": farm_sleep}}), 200
+        return jsonify({'status': 'OK', "message": "Startup variables returned.", "data": {"flag_regex": flag_regex, "ip_range": f"{','.join(ip_range)}", "my_ip": my_ip, "farm_sleep": farm_sleep}}), 200
     except:
         return jsonify({'status': 'ERROR', 'message': "Error getting startup variables."}), 500
 
