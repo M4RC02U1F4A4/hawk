@@ -1,5 +1,7 @@
 # HAWK - Farm for attack-defense CTF competitions 
 
+![alt text](readme_img/hawk.png)
+
 ---
 
 ## Description
