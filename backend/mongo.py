@@ -9,7 +9,7 @@ import ipaddress
 import re
 from flask import jsonify
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.INFO)
 
 mongo_client = pymongo.MongoClient(f"{env.MONGODB_CONNECTION_STRING}")
 db = mongo_client.hawk
@@ -355,4 +355,4 @@ def farm_submit_script_status():
     if extract_farm_submit():
         return jsonify({'status': 'OK', 'message': 'Submit script configured.'}), 200
     else:
-        return jsonify({'status': 'ERROR', 'message': 'No submit script found.'}), 500
+        return jsonify({'status': 'ERROR', 'message': 'No submit script found.'}), 404
