@@ -1,2 +1,3 @@
 backend/__pycache__/
 backend/.env
+frontend/pubblic/main.css
