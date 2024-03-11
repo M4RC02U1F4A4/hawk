@@ -1,0 +1,588 @@
+openapi: 3.0.0
+servers:
+  - url: http://localhost:5000
+    description: Flask development port
+info:
+  description: This web service allows you to manage all the exploits written by the team in one place and on the other hand to automatically submit all the flags collected. In addition, it allows the user not to worry about the format of the flag and the hosts on which to launch the attacks.
+  version: 1.0.0
+  title: HAWK - Farm for attack-defense CTF competitions
+  termsOfService: ''
+tags:
+  - name: service
+    description: ''
+  - name: script
+    description: ''
+  - name: farm
+    description: ''
+  - name: attack
+  - name: startup
+paths:
+  /service/create:
+    post:
+      summary: 'Create a new service'
+      tags:
+        - service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: test
+                port:
+                  type: integer
+                  example: 8080
+      responses:
+        '201':
+          description: Service added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 65ecc792df4e8eac45563a52
+                  status:
+                    type: string
+                    example: Service with ID '65ecc792df4e8eac45563a52' added.
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Invalid
+        '500':
+          description: Error adding service
+  /service/delete:
+    delete:
+      summary: 'Delete service'
+      tags:
+        - service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 65ecc792df4e8eac45563a52
+      responses:
+        '200':
+          description: Service added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 65ecc792df4e8eac45563a52
+                  status:
+                    type: string
+                    example: Service with ID '65ecc792df4e8eac45563a52' deleted.
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Invalid
+        '403':
+          description: There are still scripts associated with the service
+        '500':
+          description: Error deleting service
+  /service/edit:
+    put:
+      summary: 'Edit service'
+      tags:
+        - service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 65ee2dc0952f8eb41ece47d7
+                name:
+                  type: string
+                  example: test
+                port:
+                  type: integer
+                  example: 8181
+      responses:
+        '200':
+          description: Service added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Service with ID '65ee2dc0952f8eb41ece47d7' edited.
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Invalid
+        '404':
+          description: Service not found
+        '500':
+          description: Error edit service
+  /service/get:
+    get:
+      summary: 'Get services'
+      tags:
+        - service
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          example: 65eb942ea709d90d06c2a53b
+                        count:
+                          type: integer
+                          example: 4
+                        name:
+                          type: string
+                          example: test
+                        port:
+                          type: string
+                          example: 8080
+                  message:
+                    type: string
+                    example: Services extracted.
+                  status:
+                    type: string
+                    example: OK
+        '500':
+          description: Error edit service
+  /script/add:
+    post:
+      summary: 'Upload a new script'
+      tags:
+        - script
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user_script:
+                  type: string
+                  format: binary
+                  description: exploit.py
+                user_requirements:
+                  type: string
+                  format: binary
+                  description: requirements.txt
+                service:
+                  type: string
+                  description: service ID
+                name:
+                  type: string
+                  description: Script name
+                username:
+                  type: string
+                  description: Username of the user that upload the file
+      responses:
+        '201':
+          description: Service added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 65ecc792df4e8eac45563a52
+                  status:
+                    type: string
+                    example: Script added.
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Missing fields
+        '500':
+          description: Error adding service
+  /script/delete:
+    delete:
+      summary: 'Delete script'
+      tags:
+        - script
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 65ecc792df4e8eac45563a52
+      responses:
+        '200':
+          description: Service added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 65ecc792df4e8eac45563a52
+                  status:
+                    type: string
+                    example: Script with ID '65ecc792df4e8eac45563a52' deleted.
+                  message:
+                    type: string
+                    example: OK
+        '400':
+          description: Invalid
+        '500':
+          description: Error deleting script
+  /attack/start/{id}:
+    get:
+      summary: "Start an attack"
+      tags:
+        - attack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: "ID of the attack"
+      responses:
+        '201':
+          description: "Attack started successfully"
+        '500':
+          description: "Error"
+  /attack/stop/{id}:
+    get:
+      summary: "Stop an attack"
+      tags:
+        - attack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: "ID of the attack"
+      responses:
+        '200':
+          description: "Attack stopped successfully"
+        '500':
+          description: "Error"
+  /attack/status/{id}:
+    get:
+      summary: "Get status of an attack"
+      tags:
+        - attack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: "ID of the attack"
+      responses:
+        '200':
+          description: "Status retrieved successfully"
+        '500':
+          description: "Error"
+  /attack/status:
+    get:
+      summary: "Get status of all attacks"
+      tags:
+        - attack
+      responses:
+        '200':
+          description: "Status of all attacks retrieved successfully"
+        '500':
+          description: "Error"
+  /attack/logs/{id}:
+    get:
+      summary: "Get logs of an attack"
+      tags:
+        - attack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: "ID of the attack"
+      responses:
+        '200':
+          description: "Logs retrieved successfully"
+        '500':
+          description: "Error"
+  /startup:
+    post:
+      summary: "Start up the service"
+      tags:
+        - startup
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Payload for starting up the service"
+          required: true
+          schema:
+            type: "object"
+            properties:
+              flag_regex:
+                type: "string"
+                example: "[A-Z]{3}"
+                description: "Regular expression for flag"
+              ip_range:
+                type: "string"
+                example: "10.0.0.1, 10.0.0.2, 10.0.0.3, 10.0.0.4, 10.0.0.5"
+                description: "IP range"
+              my_ip:
+                type: "string"
+                example: "10.0.0.2"
+                description: "Client IP"
+              farm_sleep:
+                type: "integer"
+                example: 100
+                description: "Sleep time for farming"
+      responses:
+        '200':
+          description: Startup done
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      farm_sleep:
+                        type: "integer"
+                        example: 100
+                        description: "Sleep time for farming"
+                      flag_regex:
+                        type: "string"
+                        example: "[A-Z]{3}"
+                        description: "Regular expression for flag"
+                      ip_range:
+                        type: "array"
+                        items:
+                          type: "string"
+                        example: 
+                          - "10.0.0.1"
+                          - "10.0.0.3"
+                          - "10.0.0.4"
+                          - "10.0.0.5"
+                        description: "IP range"
+                      my_ip:
+                        type: "string"
+                        example: "10.0.0.2"
+                        description: "Client IP"
+              message:
+                type: "string"
+                example: "Startup variables updated."
+                description: "Message regarding startup process"
+              status:
+                type: "string"
+                example: "OK"
+                description: "Status of the response"
+        '400':
+          description: Invalid
+        '500':
+          description: Error edit service
+    get:
+      summary: "Get status of all attacks"
+      tags:
+        - startup
+      responses:
+        '200':
+          description: Startup done
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: "object"
+                    properties:
+                      farm_sleep:
+                        type: "integer"
+                        example: 100
+                        description: "Sleep time for farming"
+                      flag_regex:
+                        type: "string"
+                        example: "[A-Z]{3}"
+                      ip_range:
+                        type: "string"
+                        example: "10.0.0.1,10.0.0.3,10.0.0.4"
+                      my_ip:
+                        type: "string"
+                        example: "10.0.0.2"
+                  message:
+                    type: "string"
+                    example: "Startup variables returned."
+                  status:
+                    type: "string"
+                    example: "OK"
+        '500':
+          description: "Error"
+  /farm/start:
+    get:
+      summary: "Start the farm"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: "Farm started"
+        '500':
+          description: "Error"
+  /farm/stop:
+    get:
+      summary: "Stop the farm"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: "Farm stopped"
+        '500':
+          description: "Error"
+  /farm/status:
+    get:
+      summary: "Get farm status"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: "Status retrieved successfully"
+        '500':
+          description: "Error"
+  /farm/logs:
+    get:
+      summary: "Get logs of an attack"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: "Logs retrieved successfully"
+        '500':
+          description: "Error"
+  /farm/submit/script/add:
+    post:
+      summary: Add submit script and requirements
+      tags:
+        - farm
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                submit_script:
+                  type: string
+                  format: binary
+                submit_requirements:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Success response
+        '400':
+          description: Invalid
+        '500':
+          description: Error
+  /farm/submit/script/status:
+    get:
+      summary: "Get submit script status"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: Success response indicating the submit script is configured.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  message:
+                    type: string
+                    example: Submit script configured.
+        '404':
+          description: Error response indicating no submit script found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ERROR
+                  message:
+                    type: string
+                    example: No submit script found.
+  /farm/flags/get:
+    get:
+      summary: "Get flags stats"
+      tags:
+        - farm
+      responses:
+        '200':
+          description: "Flags successfully extracted"
+        '500':
+          description: "Error during flag extraction"
+  /farm/flags/submit:
+    post:
+      summary: Submit flags to the farm
+      tags:
+        - farm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                flags:
+                  type: string
+              required:
+                - flags
+      responses:
+        '202':
+          description: Flags submitted successfully
+        '400':
+          description: Invalid
