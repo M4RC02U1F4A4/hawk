@@ -1,0 +1,68 @@
+name: New release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  backend-build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Image
+      run: |
+        if [[ "${{ github.event.release.tag_name }}" != *"beta"* ]]; then
+          docker build -f backend/Dockerfile -t ghcr.io/m4rc02u1f4a4/hawk-backend:latest -t ghcr.io/m4rc02u1f4a4/hawk-backend:${{ github.event.release.tag_name }} backend
+        else
+          docker build -f backend/Dockerfile -t ghcr.io/m4rc02u1f4a4/hawk-backend:beta -t ghcr.io/m4rc02u1f4a4/hawk-backend:${{ github.event.release.tag_name }} backend
+        fi
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u m4rc02u1f4a4 --password-stdin
+
+    - name: Push Docker Image to GitHub Container Registry
+      run: |
+        if [[ "${{ github.event.release.tag_name }}" != *"beta"* ]]; then
+          docker push ghcr.io/m4rc02u1f4a4/hawk-backend:latest
+          docker push ghcr.io/m4rc02u1f4a4/hawk-backend:${{ github.event.release.tag_name }}
+        else
+          docker push ghcr.io/m4rc02u1f4a4/hawk-backend:beta
+          docker push ghcr.io/m4rc02u1f4a4/hawk-backend:${{ github.event.release.tag_name }}
+        fi
+  
+  frontend-build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Frontend Docker Image
+      run: |
+        if [[ "${{ github.event.release.tag_name }}" != *"beta"* ]]; then
+          docker build -f frontend/Dockerfile -t ghcr.io/m4rc02u1f4a4/hawk-frontend:latest -t ghcr.io/m4rc02u1f4a4/hawk-frontend:${{ github.event.release.tag_name }} frontend
+        else
+        docker build -f frontend/Dockerfile -t ghcr.io/m4rc02u1f4a4/hawk-frontend:beta -t ghcr.io/m4rc02u1f4a4/hawk-frontend:${{ github.event.release.tag_name }} frontend
+        fi
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u m4rc02u1f4a4 --password-stdin
+
+    - name: Push Frontend Docker Image to GitHub Container Registry
+      run: |
+        if [[ "${{ github.event.release.tag_name }}" != *"beta"* ]]; then
+          docker push ghcr.io/m4rc02u1f4a4/hawk-frontend:latest
+          docker push ghcr.io/m4rc02u1f4a4/hawk-frontend:${{ github.event.release.tag_name }}
+        else
+          docker push ghcr.io/m4rc02u1f4a4/hawk-frontend:beta
+          docker push ghcr.io/m4rc02u1f4a4/hawk-frontend:${{ github.event.release.tag_name }}
+        fi
