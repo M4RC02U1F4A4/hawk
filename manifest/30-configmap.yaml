@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: hawk-config
-  namespace: hawk
-data:
-  MONGODB_CONNECTION_STRING: "mongodb://hawk-db:27017/"

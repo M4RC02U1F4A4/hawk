@@ -16,13 +16,26 @@ All user-loaded scripts are started as pods on kubernetes, which allows scripts 
 ![](readme_img/attacks.png)
 
 ### Farm
-The farm allows the automatic sending of flags to the game server. Its operation depends on a script entered by the players so that the submission can be customised according to the way the game server accepts it. All the flags are stored in a DB. The database allows you to keep track of all the fags collected, so you can know the efficiency status of the scripts and avoid sending the same flag over and over again
+The farm allows the automatic sending of flags to the game server. Its operation depends on a script entered by the players so that the submission can be customised according to the way the game server accepts it. All the flags are stored in a DB. The database allows you to keep track of all the fags collected, so you can know the efficiency status of the scripts and avoid sending the same flag over and over again.
 
 ![](readme_img/farm_started.png)
 
 ## Deploy
 
-TODO
+`⚠️ The following manifest was written and tested for a k3s cluster with StorageClass Longhorn. In case your environment is different, it is necessary to edit the file before proceeding ⚠️`
+
+You can obtain in manifest for deployment via the following link:
+
+```
+https://raw.githubusercontent.com/M4RC02U1F4A4/hawk/main/manifest/hawk.yaml
+```
+
+Before deploying, change the `REACT_APP_API_BASE_URL` value in the configmap to the IP of the host on which the service runs, after that, you can apply the manifest
+
+The deployed services will be accessible at the following addresses:
+- WEB PORTAL -> `http://<HOST_IP>:30080`
+- API -> `http://<HOST_IP>:30051`
+- DB -> `http://<HOST_IP>:30017`
 
 ## Configuration
 After starting the service, it is essential to fill in all the fields of the Settings
