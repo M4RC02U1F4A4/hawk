@@ -1,5 +1,6 @@
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from kubernetes.config.config_exception import ConfigException
 import mongo
 import base64
 from datetime import datetime, timezone
@@ -11,7 +12,14 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(messa
 
 def create_new_attack(namespace, script_id):
     try:
-        config.load_kube_config()
+        try:
+            config.load_kube_config()
+        except ConfigException:
+            logging.warn("Error during local cluster config load, trying with in-cluster config.")
+            try:
+                config.load_incluster_config()
+            except ConfigException:
+                return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     except:
         return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     try:
@@ -97,7 +105,14 @@ def create_new_attack(namespace, script_id):
 
 
 def stop_attack(namespace, script_id):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     success = True
     api_instance = client.CoreV1Api()
     try:
@@ -115,7 +130,14 @@ def stop_attack(namespace, script_id):
     
 
 def get_status_id(namespace, script_id):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     api_instance = client.CoreV1Api()
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
@@ -125,7 +147,14 @@ def get_status_id(namespace, script_id):
         return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
     
 def get_status_all(namespace):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     api_instance = client.CoreV1Api()
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
@@ -137,7 +166,14 @@ def get_status_all(namespace):
         return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
 
 def get_logs_id(namespace, script_id):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     api_instance = client.CoreV1Api()
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
@@ -155,7 +191,14 @@ def get_logs_id(namespace, script_id):
 def start_farm(namespace):
     stop_farm(namespace)
     try:
-        config.load_kube_config()
+        try:
+            config.load_kube_config()
+        except ConfigException:
+            logging.warn("Error during local cluster config load, trying with in-cluster config.")
+            try:
+                config.load_incluster_config()
+            except ConfigException:
+                return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     except:
         return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     try:
@@ -189,7 +232,6 @@ def start_farm(namespace):
             except:
                 return jsonify({'status': 'ERROR', 'message': 'Error updating farm config map.'}), 500
     except ApiException as e:
-        print(e)
         return jsonify({'status': 'ERROR', 'message': 'Error creating farm config map.'}), 500
 
     try:
@@ -239,7 +281,14 @@ def start_farm(namespace):
     return jsonify({'status': "OK", 'message': "Farm started."}), 200
 
 def stop_farm(namespace):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     success = True
     api_instance = client.CoreV1Api()
     try:
@@ -256,7 +305,14 @@ def stop_farm(namespace):
     return jsonify({'status': "OK", 'message':f"Farm stopped."}), 200
 
 def get_farm_status(namespace):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     api_instance = client.CoreV1Api()
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
@@ -266,7 +322,14 @@ def get_farm_status(namespace):
         return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
     
 def get_farm_logs(namespace):
-    config.load_kube_config()
+    try:
+        config.load_kube_config()
+    except ConfigException:
+        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        try:
+            config.load_incluster_config()
+        except ConfigException:
+            return jsonify({'status': 'ERROR', 'message': 'Error loading kube config.'}), 500
     api_instance = client.CoreV1Api()
     try:
         pod_list = api_instance.list_namespaced_pod(namespace=namespace)
