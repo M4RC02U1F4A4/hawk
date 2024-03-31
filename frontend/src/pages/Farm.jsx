@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDataContext } from '../context/Data';
-import { Card, CardHeader, CardBody, Button, Textarea, Chip, Progress } from "@nextui-org/react";
+import { useDisclosure, Card, CardHeader, CardBody, Button, Textarea, Chip, Progress } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from "@nextui-org/react";
 import config from "../config";
 import { toast } from 'react-toastify';
 import SingleFileUploader from "./components/FileUploader";
@@ -23,6 +24,7 @@ export default function Farm() {
   const [requirementsFile, setRequirementsFile] = useState();
   const [farmLogs, setFarmLogs] = useState();
   const [fetchLogsIntervalId, setFetchLogsIntervalId] = useState(null);
+  const { isOpen: isOpenFarmScript, onOpen: onOpenFarmScript, onOpenChange: onOpenChangeFarmScript, onClose: onCloseFarmScript } = useDisclosure();
 
   const handleAddSubmitScript = async () => {
     try {
@@ -48,6 +50,7 @@ export default function Farm() {
       if (response.ok && responseData.status === "OK") {
         toast.success(responseData.message);
         fetchSubmitScript();
+        onCloseFarmScript();
       } else {
         toast.error(responseData.message || "Failed to update submit script.");
       }
@@ -229,89 +232,120 @@ export default function Farm() {
         <FarmCard title="rejected" dataKey="rejected" flagsData={flagsData} />
         <FarmCard title="error" dataKey="error" flagsData={flagsData} />
       </div>
-      <div className="grid grid-cols-2 gap-4 px-10 m-1 mt-10">
-        <div className="grid grid-cols-2">
-          <div>
-            <SingleFileUploader
-              title={"Submit Script"}
-              onFileChange={(item) => {
-                setScriptFile(item);
-              }}
-            />
-            <SingleFileUploader
-              title={"Requirements"}
-              onFileChange={(item) => {
-                setRequirementsFile(item);
-              }}
-            />
-            <Button
-              className="mt-4"
-              fullWidth
-              size="lg"
-              color="primary"
-              variant="ghost"
-              onClick={handleAddSubmitScript}>
-              Update submit script
-            </Button>
+      <div className="grid grid-cols-5 gap-4 px-10 m-1 mt-10 flex">
+        <div className='col-start-1 col-end-3 flex flex-col space-y-4'>
+          {submitScriptData && submitScriptData["status"] === "OK" ? (
+            <Card className='h-full'>
+              <CardBody className="flex items-center justify-center h-full">
+                <p className="font-mono text-2xl text-success">FARM READY TO START</p>
+              </CardBody>
+            </Card>
+          ) : submitScriptData && submitScriptData["status"] === "ERROR" ? (
+            <Card className='h-full'>
+              <CardBody className="flex items-center justify-center h-full">
+                <p className="font-mono text-2xl text-danger">NO SUBMIT SCRIPT FOUND</p>
+              </CardBody>
+            </Card>
+          ) : (
+            <></>
+          )}
+            <div className="mt-auto">
+              <Button
+                className="mt-4"
+                fullWidth
+                size="lg"
+                color="primary"
+                variant="ghost"
+                onPress={onOpenFarmScript}>
+                EDIT FARM SUBMIT SCRIPT
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center justify-center">
-            {submitScriptData && submitScriptData["status"] === "OK" ? (
-              <Chip
+          <div className='col-start-3 col-end-6 flex flex-col space-y-4'>
+            <Textarea
+              label="MANUAL FLAGS SUBMISSIONS"
+              value={manualFlags}
+              onChange={(e) => setManualFlags(e.target.value)}
+            />
+            <div className="mt-auto">
+              <Button
+                className="mt-4"
+                fullWidth
                 size="lg"
-                variant="solid"
-                color="success"
-                radius="sm"
-                className="text-xl">
-                <p>FARM READY TO START</p>
-              </Chip>
-            ) : submitScriptData && submitScriptData["status"] === "ERROR" ? (
-              <Chip
-                size="lg"
-                variant="solid"
-                color="danger"
-                radius="sm"
-                className="text-xl">
-                <p>NO SUBMIT SCRIPT FOUND</p>
-              </Chip>
-            ) : (
-              <></>
-            )}
+                color="primary"
+                variant="ghost"
+                onClick={handleSubmit}>
+                SUBMIT
+              </Button>
+            </div>
           </div>
         </div>
-        <div>
-          <Textarea
-            label="MANUAL FLAGS SUBMISSIONS"
-            value={manualFlags}
-            onChange={(e) => setManualFlags(e.target.value)}
-          />
-          <Button
-            className="mt-4"
-            fullWidth
-            size="lg"
-            color="primary"
-            variant="ghost"
-            onClick={handleSubmit}>
-            SUBMIT
-          </Button>
-        </div>
+      <div>
+        {farmStatusData && farmStatusData["phase"] === "Running" && (
+          <div className="grid grid-cols-1 px-10 mt-10 ">
+            <div className="flex justify-center">
+              <pre aria-label="logs" className="font-mono text-sm">
+                {farmLogs}
+              </pre>
+            </div>
+            <div className="flex justify-center mt-5">
+              <Progress
+                aria-label="progress-bar"
+                size="sm"
+                isIndeterminate
+                className="max-w-md"
+              />
+            </div>
+          </div>
+        )}
       </div>
-      {farmStatusData && farmStatusData["phase"] === "Running" && (
-        <div className="grid grid-cols-1 px-10 mt-10 ">
-          <div className="flex justify-center">
-            <pre aria-label="logs" className="font-mono text-sm">
-              {farmLogs}
-            </pre>
-          </div>
-          <div className="flex justify-center mt-5">
-            <Progress
-              aria-label="progress-bar"
-              size="sm"
-              isIndeterminate
-              className="max-w-md"
-            />
-          </div>
-        </div>
-      )}
+
+      <Modal
+          isOpen={isOpenFarmScript}
+          onOpenChange={onOpenChangeFarmScript}
+          className="dark text-foreground bg-background"
+          backdrop="blur"
+          hideCloseButton>
+          <ModalContent>
+            {(onCloseFarmScript) => (
+              <>
+                <ModalHeader>Edit farm submit script</ModalHeader>
+                <ModalBody>
+                <div className=''>
+                  <div>
+                  <SingleFileUploader
+                    title={"Submit Script"}
+                    onFileChange={(item) => {
+                      setScriptFile(item);
+                    }}
+                  />
+                  <SingleFileUploader
+                    title={"Requirements"}
+                    onFileChange={(item) => {
+                      setRequirementsFile(item);
+                    }}
+                  />
+                  </div>
+                </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button
+                    color="danger"
+                    variant="light"
+                    className="mt-4"
+                    onPress={onCloseFarmScript}>Cancel</Button>
+                  <Button
+                      className="mt-4"
+                      fullWidth
+                      color="primary"
+                      onClick={handleAddSubmitScript}>
+                      Update submit script
+                    </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
     </>
   );
 }

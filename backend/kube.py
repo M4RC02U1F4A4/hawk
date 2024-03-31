@@ -7,7 +7,7 @@ import env
 import logging
 from flask import jsonify
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(funcName)s - %(message)s', level=logging.INFO)
 
 def create_new_attack(namespace, script_id):
     try:
