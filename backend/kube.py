@@ -15,7 +15,7 @@ def create_new_attack(namespace, script_id):
         try:
             config.load_kube_config()
         except ConfigException:
-            logging.warn("Error during local cluster config load, trying with in-cluster config.")
+            logging.debug("Error during local cluster config load, trying with in-cluster config.")
             try:
                 config.load_incluster_config()
             except ConfigException:
@@ -108,7 +108,7 @@ def stop_attack(namespace, script_id):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -133,7 +133,7 @@ def get_status_id(namespace, script_id):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -150,7 +150,7 @@ def get_status_all(namespace):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -169,7 +169,7 @@ def get_logs_id(namespace, script_id):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -194,7 +194,7 @@ def start_farm(namespace):
         try:
             config.load_kube_config()
         except ConfigException:
-            logging.warn("Error during local cluster config load, trying with in-cluster config.")
+            logging.debug("Error during local cluster config load, trying with in-cluster config.")
             try:
                 config.load_incluster_config()
             except ConfigException:
@@ -284,7 +284,7 @@ def stop_farm(namespace):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -308,7 +308,7 @@ def get_farm_status(namespace):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
@@ -325,7 +325,7 @@ def get_farm_logs(namespace):
     try:
         config.load_kube_config()
     except ConfigException:
-        logging.warn("Error during local cluster config load, trying with in-cluster config.")
+        logging.debug("Error during local cluster config load, trying with in-cluster config.")
         try:
             config.load_incluster_config()
         except ConfigException:
