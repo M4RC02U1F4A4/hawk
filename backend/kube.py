@@ -144,7 +144,7 @@ def get_status_id(namespace, script_id):
         matching_pods = [pod for pod in pod_list.items if script_id in pod.metadata.name][0]
         return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}), 200
     except:
-        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.', 'phase': 'NA'}), 500
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.', 'data':{'name': 'NA', 'phase': 'NA', 'uptime': 'NA'}}), 500
     
 def get_status_all(namespace):
     try:
@@ -319,7 +319,7 @@ def get_farm_status(namespace):
         matching_pods = [pod for pod in pod_list.items if "hawk-farm" in pod.metadata.name][0]
         return jsonify({'status': 'OK', 'message': 'Status retrived successfully.', 'data':{'name':matching_pods.metadata.name, 'phase': matching_pods.status.phase, 'uptime': (datetime.now(timezone.utc) - matching_pods.status.start_time).total_seconds()}}), 200
     except:
-        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.'}), 500
+        return jsonify({'status': 'ERROR', 'message': 'Error getting pod status.', 'data':{'name': 'NA', 'phase': 'NA', 'uptime': 'NA'}}), 500
     
 def get_farm_logs(namespace):
     try:
