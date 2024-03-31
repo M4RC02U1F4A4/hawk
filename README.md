@@ -35,7 +35,7 @@ Before deploying, change the `REACT_APP_API_BASE_URL` value in the configmap to 
 The deployed services will be accessible at the following addresses:
 - WEB PORTAL -> `http://<HOST_IP>:30080`
 - API -> `http://<HOST_IP>:30051`
-- DB -> `http://<HOST_IP>:30017`
+- DB -> `mongodb://<HOST_IP>:30017`
 
 ## Configuration
 After starting the service, it is essential to fill in all the fields of the Settings
