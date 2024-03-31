@@ -44,7 +44,7 @@ After starting the service, it is essential to fill in all the fields of the Set
 
 The required fields are as follows:
 - `Flag regex` -> flag regexe, allows the automation of flag extraction from the output of the expoits
-- `IP Range` -> range of opponents' IPs, it is used to know to which address the exploits should be launched
+- `IP List` -> list of opponents' IPs, it is used to know to which address the exploits should be launched
 - `Team IP` -> IP of your team, allows you to avoid launching expoits against your own team so you don't waste time and avoid submitting your own flags
 - `Farm sleep` -> in milliseconds, time elapsing between the submit of the flags
 
