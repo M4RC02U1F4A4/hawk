@@ -9,4 +9,4 @@ RUN export BUILD_PATH="/react-app" && npm run build
 FROM nginx:alpine
 COPY --from=build /react-app /usr/share/nginx/html
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
-LABEL org.opencontainers.image.source=https://github.com/M4RC02U1F4A4/hakw
+LABEL org.opencontainers.image.source=https://github.com/M4RC02U1F4A4/hawk
